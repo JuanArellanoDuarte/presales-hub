@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pre-Sales Dashboard · TTEC</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='200 300 860 1050'><rect x='0' y='0' width='1550' height='1550' fill='%23002551'/><path d='m548.6 389.4h79c10.9 0 19.1 8.1 19.1 19v80.3c0 10.9-8.2 19.1-19.1 19.1h-79c-10.9 0-19-8.2-19-19.1v-80.3c0-10.9 8.1-19 19-19z' fill='white'/><path d='m1000.6 977.5h-2.7c-39.5 0-167.4-10.9-167.4-143v-325.3h89.8c10.9 0 20.4-9.6 20.4-20.5v-77.6c0-10.8-9.5-20.4-20.4-20.4h-89.8v-145.7c0-10.8-9.6-20.4-20.5-20.4h-81.6c-10.9 0-20.5 9.6-20.5 20.5v588.1c0 77.6 27.3 144.3 79 190.6 47.6 43.5 115.7 68.1 189.2 68.1 73.5 0 17.7 0 25.9 0 10.9 0 17.7-9.6 17.7-20.5v-74.8c0-10.9-9.5-20.5-20.4-20.5z' fill='white'/><path d='m1000.6 1208.9c-115.7 5.5-212.4-25.8-292.7-98-25.8-23.1-39.4-39.5-51.7-69.4-9.5-20.5-9.5-39.5-34-39.5-24.5 0-72.2 0-72.2 0-12.2 0-21.8 10.9-20.4 23.1 1.4 10.9 4.1 23.2 9.5 40.9 65.4 174.2 280.5 269.5 458.8 258.6 13.6 0 21.8-8.1 21.8-20.4v-74.9c0-10.8-9.5-20.4-20.4-20.4z' fill='white'/></svg>">
+<style>
+/* ═══════════════════════════════════════
+   SHELL — navigation chrome only
+   Never affects panel content
+═══════════════════════════════════════ */
+:root {
+  --navy: #002551;
+  --blue: #007DFF;
+  --orange: #D94806;
+  --teal: #5CECD3;
+  --yellow: #FCA941;
+  --offwhite: #F9F7F5;
+  --shell-line: rgba(255,255,255,.08);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--navy);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+}
+
+/* Shell header */
+.sh { background: var(--navy); padding: 0 28px; border-bottom: 1px solid var(--shell-line); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 60px; flex-shrink: 0; z-index: 100; }
+.sh-brand { display: flex; align-items: center; gap: 14px; }
+.sh-divider { width: 1px; height: 22px; background: rgba(255,255,255,.18); }
+.sh-sub { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.45); letter-spacing: .12em; text-transform: uppercase; }
+.sh-tabs { display: flex; align-items: center; gap: 3px; background: rgba(255,255,255,.07); border-radius: 11px; padding: 4px; }
+.sh-tab { font: inherit; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.45); background: transparent; border: none; border-radius: 8px; padding: 7px 20px; cursor: pointer; transition: background .15s, color .15s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.sh-tab:hover { color: rgba(255,255,255,.8); background: rgba(255,255,255,.07); }
+.sh-tab.active { color: #fff; background: rgba(255,255,255,.14); }
+.sh-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; transition: box-shadow .2s; }
+.sh-tab[data-tab="ib"] .sh-dot { background: var(--blue); }
+.sh-tab[data-tab="ob"] .sh-dot { background: var(--orange); }
+.sh-tab.active[data-tab="ib"] .sh-dot { box-shadow: 0 0 0 3px rgba(0,125,255,.35); }
+.sh-tab.active[data-tab="ob"] .sh-dot { box-shadow: 0 0 0 3px rgba(217,72,6,.35); }
+
+/* Content area */
+.sh-content { flex: 1; position: relative; min-height: 0; overflow: hidden; }
+.sh-panel { position: absolute; inset: 0; display: none; flex-direction: column; overflow: hidden; background: var(--offwhite); }
+.sh-panel.active { display: flex; }
+.sh-stripe { height: 3px; flex-shrink: 0; }
+.sh-panel[data-panel="ib"] .sh-stripe { background: var(--blue); }
+.sh-panel[data-panel="ob"] .sh-stripe { background: var(--orange); }
+
+/* Shell footer */
+.sh-foot { background: var(--navy); border-top: 1px solid var(--shell-line); padding: 9px 28px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.sh-foot-meta { display: flex; align-items: center; gap: 20px; }
+.sh-foot-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: rgba(255,255,255,.3); }
+.sh-foot-dot { width: 6px; height: 6px; border-radius: 50%; }
+.sh-foot-item[data-r="ib"] .sh-foot-dot { background: var(--blue); opacity: .6; }
+.sh-foot-item[data-r="ob"] .sh-foot-dot { background: var(--orange); opacity: .6; }
+.sh-foot-label { font-weight: 700; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .08em; font-size: 10px; }
+.sh-foot-copy { font-size: 10px; color: rgba(255,255,255,.18); letter-spacing: .05em; }
+
+/* Print */
+@media print {
+  @page { size: A4 landscape; margin: 18mm 16mm }
+  .sh, .sh-foot { display: none; }
+  .sh-content { position: static; overflow: visible; height: auto !important; }
+  .sh-panel { position: static; display: block !important; overflow: visible; height: auto !important; }
+  .sh-panel:not(.active) { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ═══════════════════════════════════════
+   INBOUND PANEL — all selectors scoped to #ib
+═══════════════════════════════════════ */
+#ib {
+  overflow-y: auto; height: 100%;
+  --paper: var(--offwhite); --card: #fff; --line: #E3E6EB; --line2: #EEF0F3;
+  --ink: #002551; --ink2: #1A3D6B; --muted: #647387; --muted2: #8A94A3;
+  --accent: #007DFF; --accent-bg: #D6EEFF; --accent-section: #EDF6FF;
+  --hunt: #D94806; --hunt-bg: #FDEADF; --hunt-section: #FFF4EF;
+  --green: #5CECD3; --green-ink: #004D3D; --dq: #D94806;
+  --s-yet: #FCA941; --s-sched: #007DFF; --s-held: #5CECD3;
+  --s-nomeet: #9AA3B0; --s-digital: #6E6196; --s-dq: #D94806;
+  --shadow: 0 1px 2px rgba(0,37,81,.04), 0 4px 16px rgba(0,37,81,.06);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--paper);
+}
+#ib * { box-sizing: border-box; }
+#ib .topbar {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(0,37,81,.98);
+  backdrop-filter: saturate(180%) blur(8px);
+  -webkit-backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid rgba(0,125,255,.2);
+  margin: 0 -22px 26px; padding: 14px 22px;
+}
+#ib .topbar-inner {
+  max-width: 1060px; margin: 0 auto;
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 20px;
+}
+#ib .topbar-title { display: flex; flex-direction: column; gap: 2px; }
+#ib h1 { font-size: 26px; letter-spacing: -.03em; margin: 2px 0 0; font-weight: 900; color: #fff; line-height: 1.15; }
+#ib .topbar-ts { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 5px; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+#ib .topbar-ts svg { opacity: .5; flex-shrink: 0; }
+#ib .period { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 4px; font-weight: 500; }
+#ib .period b { color: rgba(255,255,255,.85); font-weight: 700; }
+#ib .topbar-filters { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+#ib .ctrl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+#ib .ctrl label { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.4); font-weight: 700; }
+#ib select {
+  font: inherit; font-size: 13px; font-weight: 700; color: #fff;
+  background: rgba(255,255,255,.1);
+  border: 1.5px solid rgba(0,125,255,.5); border-radius: 10px;
+  padding: 8px 34px 8px 14px; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+#ib select:hover { border-color: var(--accent); }
+#ib select option { background: #002551; color: #fff; }
+#ib .bdr-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+#ib .bdr-row .blabel { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.4); font-weight: 700; }
+#ib .bdr-btn { font: inherit; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.6); background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.12); border-radius: 20px; padding: 6px 14px; cursor: pointer; transition: background .12s, color .12s, border-color .12s; white-space: nowrap; }
+#ib .bdr-btn:hover { background: rgba(255,255,255,.14); color: #fff; }
+#ib .bdr-btn.active { color: #fff; background: var(--accent); border-color: var(--accent); }
+#ib .topbar-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+#ib .export-btn { font: inherit; font-size: 12px; font-weight: 700; color: #fff; background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.2); border-radius: 10px; padding: 9px 16px; cursor: pointer; white-space: nowrap; transition: background .12s; }
+#ib .export-btn:hover { background: rgba(255,255,255,.2); }
+#ib .print-context { display: none; }
+@media print { #ib .print-context { display: block; font-size: 11px; color: #fff; margin-top: 6px; font-weight: 600; opacity: .85; } #ib .print-context span { font-weight: 400; opacity: .7; } }
+#ib .wrap { max-width: 1060px; margin: 0 auto; padding: 0 22px 64px; }
+#ib .kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 22px; }
+#ib .kpi { background: var(--card); border: 1px solid var(--line); border-top: 3px solid var(--ink2); border-radius: 14px; padding: 18px 16px 16px; box-shadow: var(--shadow); text-align: center; }
+#ib .kpi.g { border-top-color: var(--green); }
+#ib .kpi.d { border-top-color: var(--dq); }
+#ib .kpi .cap { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); font-weight: 800; }
+#ib .kpi .num { font-size: 46px; font-weight: 800; letter-spacing: -.035em; line-height: 1; margin-top: 12px; }
+#ib .kpi .num.zero { color: var(--muted2); }
+#ib .kpi.g .num { color: var(--green-ink); }
+#ib .kpi.d .num { color: var(--dq); }
+#ib .kpi .sub { font-size: 12px; color: var(--muted); margin-top: 9px; min-height: 16px; }
+#ib .section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 18px; box-shadow: var(--shadow); }
+#ib .section h2 { font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; margin: 0; font-weight: 800; color: var(--ink); }
+#ib .section .note { font-size: 12.5px; color: var(--muted); margin: 5px 0 16px; }
+#ib .donut-wrap { display: grid; grid-template-columns: auto 1px 1fr 1px 1fr; align-items: center; gap: 28px; }
+#ib .donut-divider { width: 1px; background: var(--line2); align-self: stretch; min-height: 120px; }
+#ib .donut-svg-wrap { position: relative; flex: none; }
+#ib .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; pointer-events: none; }
+#ib .donut-center .dc-n { font-size: 38px; font-weight: 800; letter-spacing: -.04em; color: var(--ink); line-height: 1; }
+#ib .donut-center .dc-l { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 4px; }
+#ib .donut-legend { display: flex; flex-direction: column; gap: 13px; }
+#ib .dl-row { display: flex; align-items: center; gap: 10px; }
+#ib .dl-dot { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+#ib .dl-label { font-size: 13px; color: var(--ink2); font-weight: 600; flex: 1; }
+#ib .dl-val { font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ink); min-width: 24px; text-align: right; }
+#ib .dl-pct { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+#ib .dl-sep { font-size: 12px; color: var(--line); margin: 0 3px; }
+#ib .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+#ib .rows { display: flex; flex-direction: column; gap: 11px; }
+#ib .row { display: grid; grid-template-columns: 140px 1fr auto; align-items: center; gap: 12px; }
+#ib .row .name { font-size: 13px; font-weight: 600; color: var(--ink2); }
+#ib .row .bar { height: 13px; background: var(--line2); border-radius: 7px; overflow: hidden; }
+#ib .row .bar i { display: block; height: 100%; border-radius: 7px; background: var(--accent); transition: width .5s ease; }
+#ib .portgrid .bar i { background: var(--green-ink); }
+#ib .dqgrid .bar i { background: var(--dq); }
+#ib .row .val { display: flex; align-items: center; justify-content: flex-end; gap: 9px; font-variant-numeric: tabular-nums; }
+#ib .row .val .abs { color: var(--accent); font-weight: 800; font-size: 13px; min-width: 20px; text-align: right; }
+#ib .row .val .sep { width: 1px; height: 13px; background: var(--line); display: inline-block; }
+#ib .row .val .pc { color: var(--green-ink); font-weight: 700; font-size: 12.5px; min-width: 34px; text-align: right; }
+#ib .sh-tiles { display: grid; grid-template-columns: 200px 1fr; gap: 14px; align-items: start; }
+#ib .tile { border: 1px solid var(--line); border-radius: 12px; padding: 16px 16px 14px; background: #FCFCFD; }
+#ib .tile .tn { font-size: 34px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+#ib .tile .tl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 9px; }
+#ib .tile .td { font-size: 11.5px; color: var(--muted2); margin-top: 5px; }
+#ib .tile.assigned .tn { color: var(--green-ink); }
+#ib .tile.assigned { border-color: var(--green); }
+#ib .sh-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0; position: relative; }
+#ib .sh-two-col::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--line2); }
+#ib .sh-col-inner { display: flex; flex-direction: column; gap: 7px; padding: 0 12px; }
+#ib .sh-col-inner:first-child { padding-left: 0; }
+#ib .sh-col-inner:last-child { padding-right: 0; }
+#ib .sh-two-col.single-col { grid-template-columns: 1fr; }
+#ib .sh-two-col.single-col::after { display: none; }
+#ib .sh-two-col.single-col .sh-col-inner:last-child { display: none; }
+#ib .sl-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13px; }
+#ib .sl-name { color: var(--ink2); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#ib .sl-n { color: var(--accent); font-weight: 800; font-variant-numeric: tabular-nums; flex: none; }
+#ib .sl-empty { font-size: 12px; color: var(--muted2); line-height: 1.4; }
+#ib .nda-tiles { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+#ib .nda-tile { flex: 1; min-width: 90px; border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px 11px; background: #FCFCFD; text-align: center; }
+#ib .nda-tile .nt-n { font-size: 28px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+#ib .nda-tile .nt-l { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 7px; }
+#ib .tbl-wrap { overflow-x: auto; }
+#ib .tbl { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+#ib .tbl th { text-align: left; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 800; padding: 9px 10px; border-bottom: 2px solid var(--line); white-space: nowrap; }
+#ib .tbl td { padding: 9px 10px; border-bottom: 1px solid var(--line2); vertical-align: top; white-space: normal; word-break: break-word; }
+#ib .tbl tr:hover td { background: #EDECE8; }
+#ib .tbl .co { font-weight: 700; color: var(--ink); }
+#ib .tbl .dt { color: var(--muted2); white-space: nowrap; }
+#ib .spill { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; color: var(--ink2); white-space: nowrap; }
+#ib .spill .pd { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+#ib .dash { color: var(--muted2); }
+#ib .dt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+#ib .tcount { font-size: 12px; color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
+#ib .foot { margin-top: 28px; display: flex; align-items: center; justify-content: center; gap: 18px; font-size: 11px; color: var(--muted2); letter-spacing: .05em; }
+#ib .foot-note { font-size: 11px; color: var(--muted2); letter-spacing: .05em; }
+@media (max-width: 820px) {
+  #ib .kpis { grid-template-columns: repeat(2,1fr); }
+  #ib .grid2 { grid-template-columns: 1fr; }
+  #ib .sh-tiles { grid-template-columns: 1fr; }
+  #ib .row { grid-template-columns: 110px 1fr auto; }
+  #ib .donut-wrap { grid-template-columns: auto 1fr; }
+  #ib .donut-divider { display: none; }
+}
+@media print {
+  #ib { font-size: 11px; height: auto !important; background: #fff !important; }
+  #ib .topbar { position: static; background: rgba(0,37,81,1) !important; backdrop-filter: none; border-bottom: 1px solid rgba(0,125,255,.2); margin: 0 0 12px; padding: 10px 0; }
+  #ib .topbar-inner { grid-template-columns: 1fr; gap: 4px; }
+  #ib .topbar-filters, #ib .topbar-actions { display: none; }
+  #ib .print-context { display: block !important; }
+  #ib h1 { font-size: 18px; margin: 0; }
+  #ib .topbar-ts { font-size: 10px; margin-top: 3px; }
+  #ib .wrap { max-width: none; padding: 0; }
+  #ib .kpis { gap: 8px; margin-bottom: 12px; }
+  #ib .kpi { padding: 10px 8px; break-inside: avoid; }
+  #ib .kpi .num { font-size: 32px; margin-top: 6px; }
+  #ib .kpi .cap { font-size: 9px; }
+  #ib .kpi .sub { font-size: 10px; margin-top: 4px; }
+  #ib .section { box-shadow: none; padding: 12px 14px; margin-bottom: 10px; break-inside: avoid; }
+  #ib .section h2 { font-size: 10px; }
+  #ib .section .note { font-size: 10px; margin: 3px 0 10px; }
+  #ib .grid2 { gap: 10px; break-inside: avoid; }
+  #ib .donut-wrap { gap: 14px; }
+  #ib .donut-center .dc-n { font-size: 26px; }
+  #ib .dl-label { font-size: 11px; }
+  #ib .dl-val, #ib .dl-pct { font-size: 11px; }
+  #ib .row .name { font-size: 11px; }
+  #ib .row .val .abs, #ib .row .val .pc { font-size: 11px; }
+  #ib .sh-tiles { grid-template-columns: 160px 1fr; gap: 10px; }
+  #ib .tile .tn { font-size: 24px; }
+  #ib .sl-row { font-size: 11px; }
+  #ib .nda-tile .nt-n { font-size: 20px; }
+  #ib .tbl-wrap { overflow: visible; }
+  #ib .tbl { font-size: 10px; }
+  #ib .tbl th { font-size: 9px; padding: 5px 7px; }
+  #ib .tbl td { padding: 5px 7px; }
+  #ib .tbl tr { break-inside: avoid; }
+  #ib .foot { margin-top: 14px; }
+  #ib * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media (prefers-reduced-motion: reduce) { #ib * { transition: none !important; } }
+
+/* ═══════════════════════════════════════
+   OUTBOUND PANEL — all selectors scoped to #ob
+═══════════════════════════════════════ */
+#ob {
+  overflow-y: auto; height: 100%;
+  --paper: var(--offwhite); --card: #fff; --line: #E3E6EB; --line2: #EEF0F3;
+  --ink: #002551; --ink2: #1A3D6B; --muted: #647387; --muted2: #8A94A3;
+  --navy-ob: #002551; --navy2: #1A3D6B;
+  --outbound: #007DFF; --outbound-bg: #D6EEFF; --outbound-section: #EDF6FF;
+  --hunting: #D94806; --hunting-bg: #FDEADF; --hunting-section: #FFF4EF;
+  --planned-bg: #EDF6FF; --planned-ink: #007DFF;
+  --active-bg: #FFF4E0;  --active-ink: #B45309;
+  --done-bg: #E0FAF5;    --done-ink: #004D3D;
+  --blocked-bg: #FDEADF; --blocked-ink: #D94806;
+  --shadow: 0 1px 2px rgba(0,37,81,.04), 0 4px 16px rgba(0,37,81,.06);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--paper);
+}
+#ob * { box-sizing: border-box; }
+#ob .topbar { position: sticky; top: 0; z-index: 20; background: rgba(0,37,81,.98); backdrop-filter: saturate(180%) blur(8px); -webkit-backdrop-filter: saturate(180%) blur(8px); border-bottom: 1px solid rgba(217,72,6,.25); padding: 14px 24px; }
+#ob .topbar-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 20px; }
+#ob .topbar-title { display: flex; flex-direction: column; gap: 2px; }
+#ob h1 { font-size: 26px; letter-spacing: -.03em; margin: 2px 0 0; font-weight: 900; color: #fff; line-height: 1.15; }
+#ob .topbar-ts { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 5px; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+#ob .topbar-ts svg { opacity: .5; flex-shrink: 0; }
+#ob .period { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 4px; font-weight: 500; }
+#ob .period b { color: rgba(255,255,255,.8); font-weight: 700; }
+#ob .topbar-filters { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+#ob .filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+#ob .filter-label { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.4); font-weight: 700; }
+#ob .filter-btn { font: inherit; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.7); background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.12); border-radius: 20px; padding: 6px 14px; cursor: pointer; transition: background .12s, color .12s, border-color .12s; white-space: nowrap; }
+#ob .filter-btn:hover { background: rgba(255,255,255,.14); color: #fff; }
+#ob .filter-btn.active { background: #D94806; color: #fff; border-color: #D94806; }
+#ob .topbar-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+#ob .export-btn { font: inherit; font-size: 12px; font-weight: 700; color: #fff; background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.2); border-radius: 10px; padding: 9px 16px; cursor: pointer; white-space: nowrap; transition: background .12s; }
+#ob .export-btn:hover { background: rgba(255,255,255,.2); }
+#ob .info-btn { font: inherit; font-size: 11px; font-weight: 700; color: #fff; background: #D94806; border: none; border-radius: 10px; padding: 9px 14px; cursor: pointer; white-space: nowrap; transition: background .12s; line-height: 1.2; text-align: center; }
+#ob .info-btn:hover { background: #b83d05; }
+#ob .print-context { display: none; }
+@media print { #ob .print-context { display: block; font-size: 11px; color: #fff; margin-top: 6px; font-weight: 600; opacity: .85; } #ob .print-context span { font-weight: 400; opacity: .7; } }
+#ob .wrap { max-width: 1100px; margin: 0 auto; padding: 0 22px 64px; }
+#ob .kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin: 24px 0 20px; }
+#ob .kpi { background: var(--card); border: 1px solid var(--line); border-top: 3px solid var(--ink2); border-radius: 14px; padding: 18px 16px 16px; box-shadow: var(--shadow); text-align: center; }
+#ob .kpi.accent-outbound { border-top-color: var(--outbound); }
+#ob .kpi.accent-green { border-top-color: #5CECD3; }
+#ob .kpi.accent-meeting { border-top-color: #FCA941; }
+#ob .kpi .cap { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); font-weight: 800; }
+#ob .kpi .num { font-size: 44px; font-weight: 800; letter-spacing: -.04em; line-height: 1; margin-top: 10px; color: var(--ink); }
+#ob .kpi.accent-green .num { color: #004D3D; }
+#ob .kpi.accent-meeting .num { color: #D94806; }
+#ob .kpi .num.zero { color: var(--muted2); }
+#ob .kpi .sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
+#ob .section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 18px; box-shadow: var(--shadow); }
+#ob .section.outbound-section { background: var(--outbound-section); border-color: #B3D9FF; }
+#ob .section.hunting-section { background: var(--hunting-section); border-color: #FECDBA; }
+#ob .section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+#ob .section h2 { font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; margin: 0; font-weight: 800; color: var(--ink); }
+#ob .section-count { font-size: 11px; color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
+#ob .section .note { font-size: 12.5px; color: var(--muted); margin: 5px 0 16px; }
+#ob .outbound-section h2 { color: var(--outbound); }
+#ob .hunting-section h2 { color: var(--hunting); }
+#ob .seq-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+#ob .seq-grid.single { grid-template-columns: minmax(0,560px); justify-content: center; }
+#ob .seq-card { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: #fff; display: flex; flex-direction: column; gap: 12px; }
+#ob .outbound-section .seq-card { border-color: #B3D9FF; }
+#ob .hunting-section .seq-card { border-color: #FECDBA; }
+#ob .seq-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+#ob .seq-name { font-size: 13px; font-weight: 800; color: var(--ink); line-height: 1.3; }
+#ob .seq-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+#ob .seq-badges { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+#ob .badge { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 20px; }
+#ob .badge-outbound { background: var(--outbound-bg); color: var(--outbound); }
+#ob .badge-hunting { background: var(--hunting-bg); color: var(--hunting); }
+#ob .badge-planned { background: var(--planned-bg); color: var(--planned-ink); }
+#ob .badge-active { background: var(--active-bg); color: var(--active-ink); }
+#ob .badge-done { background: var(--done-bg); color: var(--done-ink); }
+#ob .badge-blocked { background: var(--blocked-bg); color: var(--blocked-ink); }
+#ob .prog-wrap { display: flex; flex-direction: column; gap: 5px; }
+#ob .prog-row { display: flex; justify-content: space-between; align-items: center; }
+#ob .prog-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+#ob .prog-val { font-size: 13px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+#ob .prog-bar { height: 8px; background: var(--line2); border-radius: 4px; overflow: hidden; }
+#ob .prog-bar i { display: block; height: 100%; border-radius: 4px; background: var(--outbound); transition: width .5s ease; }
+#ob .prog-bar i.hunting { background: var(--hunting); }
+#ob .seq-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; border-top: 1px solid var(--line2); padding-top: 12px; }
+#ob .seq-stat { text-align: center; }
+#ob .seq-stat .sv { font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); line-height: 1; }
+#ob .seq-stat .sl { font-size: 9px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 4px; }
+#ob .seq-stat.meeting .sv { color: #D94806; }
+#ob .tbl-wrap { overflow-x: auto; }
+#ob .tbl { width: 100%; table-layout: auto; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+#ob .tbl th { text-align: left; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 800; padding: 9px 10px; border-bottom: 2px solid var(--line); white-space: nowrap; }
+#ob .tbl td { padding: 9px 10px; border-bottom: 1px solid var(--line2); vertical-align: middle; }
+#ob .tbl tr:last-child td { border-bottom: none; }
+#ob .tbl tr:hover td { background: #EDECE8; }
+#ob .tbl .seq-col { font-weight: 700; color: var(--ink); max-width: 200px; }
+#ob .tbl .bdr-col { color: var(--muted); font-weight: 600; }
+#ob .num-cell { font-weight: 700; color: var(--ink2); text-align: right; }
+#ob .meet-cell { font-weight: 800; color: #D94806; text-align: right; }
+#ob .td-num.zero { color: var(--muted2); font-weight: 600; }
+#ob .prog-inline { display: flex; align-items: center; gap: 7px; }
+#ob .prog-inline .bar { flex: 1; height: 6px; background: var(--line2); border-radius: 3px; min-width: 60px; overflow: hidden; }
+#ob .prog-inline .bar i { display: block; height: 100%; border-radius: 3px; background: var(--outbound); }
+#ob .prog-inline .bar i.h { background: var(--hunting); }
+#ob .prog-inline .pct { font-size: 11px; font-weight: 800; color: var(--ink); min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
+#ob .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+#ob .bdr-block { display: flex; flex-direction: column; gap: 6px; padding-bottom: 12px; border-bottom: 1px solid var(--line2); }
+#ob .bdr-block:last-child { border-bottom: none; padding-bottom: 0; }
+#ob .bdr-name { font-size: 12px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+#ob .bdr-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+#ob .bdr-metric { text-align: center; background: var(--line2); border-radius: 8px; padding: 8px 6px; }
+#ob .bdr-metric .mv { font-size: 18px; font-weight: 800; color: var(--ink); line-height: 1; }
+#ob .bdr-metric .ml { font-size: 9px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 3px; }
+#ob .bar-rows { display: flex; flex-direction: column; gap: 12px; }
+#ob .bar-row { display: grid; grid-template-columns: 120px 1fr auto; align-items: center; gap: 10px; }
+#ob .bar-row .bn { font-size: 11px; font-weight: 600; color: var(--ink2); }
+#ob .bar-row .bb { height: 10px; background: var(--line2); border-radius: 5px; overflow: hidden; }
+#ob .bar-row .bb i { display: block; height: 100%; border-radius: 5px; background: var(--outbound); }
+#ob .bar-row .bv { display: flex; gap: 6px; align-items: center; justify-content: flex-end; font-variant-numeric: tabular-nums; }
+#ob .bar-row .bv .abs { font-weight: 800; font-size: 12px; min-width: 24px; text-align: right; color: var(--outbound); }
+#ob .bar-row .bv .pct { font-size: 11px; color: var(--muted); min-width: 34px; text-align: right; }
+#ob .foot { margin-top: 28px; display: flex; align-items: center; justify-content: center; gap: 18px; font-size: 11px; color: var(--muted2); letter-spacing: .05em; }
+#ob .foot-note { font-size: 11px; color: var(--muted2); letter-spacing: .05em; }
+#ob .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(16,32,59,.55); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+#ob .modal-overlay.open { display: flex; }
+#ob .modal { background: #fff; border-radius: 16px; max-width: 560px; width: 100%; max-height: 90vh; box-shadow: 0 8px 40px rgba(16,32,56,.18); overflow: hidden; display: flex; flex-direction: column; }
+#ob .modal-head { background: var(--navy-ob); padding: 22px 24px 18px; display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; }
+#ob .modal-head h3 { margin: 0; font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -.01em; }
+#ob .modal-head p { margin: 6px 0 0; font-size: 12px; color: rgba(255,255,255,.55); }
+#ob .modal-close { font: inherit; font-size: 18px; font-weight: 700; color: rgba(255,255,255,.6); background: none; border: none; cursor: pointer; line-height: 1; padding: 0; margin-left: 16px; flex-shrink: 0; }
+#ob .modal-close:hover { color: #fff; }
+#ob .modal-body { padding: 22px 24px 26px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+#ob .modal-block h4 { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 800; margin: 0 0 8px; }
+#ob .modal-block p { font-size: 13px; color: var(--ink2); margin: 0; line-height: 1.6; }
+#ob .modal-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; justify-content: center; }
+#ob .modal-pill { font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: var(--line2); color: var(--ink2); }
+#ob .modal-divider { border: none; border-top: 1px solid var(--line2); margin: 0; }
+@media (max-width: 820px) {
+  #ob .kpis { grid-template-columns: repeat(2,1fr); }
+  #ob .seq-grid, #ob .seq-grid.single { grid-template-columns: 1fr; }
+  #ob .grid2 { grid-template-columns: 1fr; }
+  #ob .topbar-inner { grid-template-columns: 1fr; justify-items: center; }
+  #ob .export-btn { display: none; }
+}
+@media print {
+  #ob { font-size: 11px; height: auto !important; background: #fff !important; }
+  #ob .topbar { position: static; background: rgba(0,37,81,1) !important; backdrop-filter: none; border-bottom: 1px solid rgba(217,72,6,.25); padding: 10px 0; margin-bottom: 12px; }
+  #ob .topbar-inner { grid-template-columns: 1fr; gap: 4px; }
+  #ob .topbar-filters, #ob .topbar-actions, #ob .modal-overlay { display: none; }
+  #ob .print-context { display: block !important; }
+  #ob h1 { font-size: 18px; margin: 0; }
+  #ob .topbar-ts { font-size: 10px; margin-top: 3px; }
+  #ob .wrap { max-width: none; padding: 0; }
+  #ob .kpis { gap: 8px; margin: 12px 0; }
+  #ob .kpi { padding: 10px 8px; break-inside: avoid; }
+  #ob .kpi .num { font-size: 32px; margin-top: 6px; }
+  #ob .kpi .cap { font-size: 9px; }
+  #ob .kpi .sub { font-size: 10px; margin-top: 4px; }
+  #ob .section { box-shadow: none; padding: 12px 14px; margin-bottom: 10px; break-inside: avoid; }
+  #ob .grid2 + .section { break-before: auto; }
+  #ob .section-head h2 { font-size: 10px; }
+  #ob .section .note { font-size: 10px; margin: 3px 0 10px; }
+  #ob .grid2 { gap: 10px; break-inside: avoid; }
+  #ob .seq-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+  #ob .seq-card { padding: 10px 12px; break-inside: avoid; }
+  #ob .seq-name { font-size: 11px; }
+  #ob .seq-meta { font-size: 9px; }
+  #ob .seq-stat .sv { font-size: 16px; }
+  #ob .seq-stat .sl { font-size: 8px; }
+  #ob .prog-bar { height: 6px; }
+  #ob .bdr-metric .mv { font-size: 14px; }
+  #ob .bdr-metric .ml { font-size: 8px; }
+  #ob .bar-row .bn { font-size: 10px; }
+  #ob .tbl-wrap { overflow: visible; }
+  #ob .tbl { font-size: 10px; }
+  #ob .tbl th { font-size: 9px; padding: 5px 7px; }
+  #ob .tbl td { padding: 5px 7px; }
+  #ob .tbl tr { break-inside: avoid; }
+  #ob .foot { margin-top: 14px; }
+  #ob * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media (prefers-reduced-motion: reduce) { #ob * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ── Shell header ── -->
+<header class="sh">
+  <div class="sh-brand">
+    <svg width="34" height="34" viewBox="200 320 850 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="m548.6 389.4h79c10.9 0 19.1 8.1 19.1 19v80.3c0 10.9-8.2 19.1-19.1 19.1h-79c-10.9 0-19-8.2-19-19.1v-80.3c0-10.9 8.1-19 19-19z" fill="white"/>
+  <path d="m1000.6 977.5h-2.7c-39.5 0-167.4-10.9-167.4-143v-325.3h89.8c10.9 0 20.4-9.6 20.4-20.5v-77.6c0-10.8-9.5-20.4-20.4-20.4h-89.8v-145.7c0-10.8-9.6-20.4-20.5-20.4h-81.6c-10.9 0-20.5 9.6-20.5 20.5v588.1c0 77.6 27.3 144.3 79 190.6 47.6 43.5 115.7 68.1 189.2 68.1 73.5 0 17.7 0 25.9 0 10.9 0 17.7-9.6 17.7-20.5v-74.8c0-10.9-9.5-20.5-20.4-20.5z" fill="white"/>
+  <path d="m1000.6 1208.9c-115.7 5.5-212.4-25.8-292.7-98-25.8-23.1-39.4-39.5-51.7-69.4-9.5-20.5-9.5-39.5-34-39.5-24.5 0-72.2 0-72.2 0-12.2 0-21.8 10.9-20.4 23.1 1.4 10.9 4.1 23.2 9.5 40.9 65.4 174.2 280.5 269.5 458.8 258.6 13.6 0 21.8-8.1 21.8-20.4v-74.9c0-10.8-9.5-20.4-20.4-20.4z" fill="white"/>
+</svg>
+    <div class="sh-divider"></div>
+    <span class="sh-sub">Pre-Sales Team</span>
+  </div>
+  <nav class="sh-tabs">
+    <button class="sh-tab active" data-tab="ib" onclick="shSwitch('ib')">
+      <span class="sh-dot"></span>Inbound
+    </button>
+    <button class="sh-tab" data-tab="ob" onclick="shSwitch('ob')">
+      <span class="sh-dot"></span>Outbound
+    </button>
+  </nav>
+  <div></div>
+</header>
+
+<!-- ── Content ── -->
+<div class="sh-content">
+
+  <!-- INBOUND PANEL -->
+  <div class="sh-panel active" data-panel="ib">
+    <div class="sh-stripe"></div>
+    <div id="ib">
+
+      <div class="topbar">
+        <div class="topbar-inner">
+          <div class="topbar-title">
+            <h1>Inbound Performance &amp; Activity</h1>
+            <div class="topbar-ts">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5V8l2.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Updated Jun 30, 2026
+            </div>
+            <div class="period" id="ib-period"></div>
+            <div class="print-context" id="ib-print-ctx"></div>
+          </div>
+          <div class="topbar-filters">
+            <div class="ctrl">
+              <label for="ib-gran">View by</label>
+              <select id="ib-gran">
+                <option value="all">All time</option>
+                <option value="quarter">Quarter</option>
+                <option value="month">Month</option>
+                <option value="week">Week</option>
+              </select>
+              <select id="ib-per" aria-label="Period"></select>
+            </div>
+            <div class="bdr-row">
+              <span class="blabel">BDR</span>
+              <div id="ib-bdr-btns"></div>
+            </div>
+          </div>
+          <div class="topbar-actions">
+            <button class="export-btn" onclick="window.print()">Save as PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div class="kpis" id="ib-kpis"></div>
+        <div class="section" id="ib-sec-status">
+          <h2>Lead Status</h2>
+          <p class="note">Current status breakdown of every assigned lead.</p>
+          <div id="ib-donut"></div>
+        </div>
+        <div class="grid2">
+          <div class="section"><h2>By Type</h2><p class="note">Mix of inbound lead types.</p><div class="rows typegrid" id="ib-by-type"></div></div>
+          <div class="section"><h2>By Vertical</h2><p class="note">Which verticals drove inbound demand.</p><div class="rows portgrid" id="ib-by-vert"></div></div>
+        </div>
+        <div class="section">
+          <h2>Seller Assignment</h2>
+          <p class="note">Tracks which inbound leads have been assigned to a seller.</p>
+          <div class="sh-tiles" id="ib-seller-tiles">
+            <div class="tile assigned"><div class="tn" id="ib-sh-assigned">0</div><div class="tl">Seller Assigned</div><div class="td">Leads with a named seller on the opp</div></div>
+            <div class="tile">
+              <div class="tl" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:12px;text-align:center">Leads by seller</div>
+              <div class="sh-two-col" id="ib-seller-list">
+                <div class="sh-col-inner" id="ib-seller-col1"></div>
+                <div class="sh-col-inner" id="ib-seller-col2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <h2>NDA Activity</h2>
+          <p class="note">NDAs with active status this period.</p>
+          <div class="nda-tiles" id="ib-nda"></div>
+        </div>
+        <div class="section">
+          <h2>Disqualification Reasons</h2>
+          <p class="note">Breakdown of why leads were disqualified this period.</p>
+          <div class="rows dqgrid" id="ib-by-dq"></div>
+        </div>
+        <div class="section" id="ib-sec-table">
+          <div class="dt-head"><h2>Lead Log</h2><span class="tcount" id="ib-tcount"></span></div>
+          <p class="note">All leads this period, most recent first.</p>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <colgroup><col style="width:10%"><col style="width:24%"><col style="width:13%"><col style="width:8%"><col style="width:18%"><col style="width:13%"><col style="width:14%"></colgroup>
+              <thead id="ib-thead"></thead>
+              <tbody id="ib-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="foot"><span class="foot-note">Inbound Performance &amp; Activity</span></div>
+      </div>
+
+    </div><!-- #ib -->
+  </div><!-- .sh-panel ib -->
+
+  <!-- OUTBOUND PANEL -->
+  <div class="sh-panel" data-panel="ob">
+    <div class="sh-stripe"></div>
+    <div id="ob">
+
+      <div class="topbar">
+        <div class="topbar-inner">
+          <div class="topbar-title">
+            <h1>Outbound Performance &amp; Activity</h1>
+            <div class="topbar-ts">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5V8l2.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Updated Jun 30, 2026
+            </div>
+            <div class="period" id="ob-period"></div>
+            <div class="print-context" id="ob-print-ctx"></div>
+          </div>
+          <div class="topbar-filters">
+            <div class="filters">
+              <span class="filter-label">BDR</span>
+              <div id="ob-bdr-btns"></div>
+            </div>
+            <div class="filters">
+              <span class="filter-label">Type</span>
+              <div id="ob-type-btns"></div>
+            </div>
+          </div>
+          <div class="topbar-actions">
+            <button class="export-btn" onclick="window.print()">Save as PDF</button>
+            <button class="info-btn" onclick="document.getElementById('ob-modal').classList.add('open')">How our outbound<br>model works</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div class="kpis" id="ob-kpis"></div>
+        <div id="ob-outbound-section"></div>
+        <div id="ob-hunting-section"></div>
+        <div class="section">
+          <div class="section-head"><h2>Sequence Summary</h2></div>
+          <p class="note">All active and planned sequences at a glance.</p>
+          <div class="tbl-wrap">
+            <table class="tbl"><thead id="ob-sum-thead"></thead><tbody id="ob-sum-tbody"></tbody></table>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="section">
+            <h2>Activity by BDR</h2>
+            <p class="note">Contacts enrolled, emails delivered, and replies per BDR.</p>
+            <div id="ob-by-bdr"></div>
+          </div>
+          <div class="section">
+            <h2>Reply Rate by Sequence</h2>
+            <p class="note">Replies divided by emails delivered, per sequence.</p>
+            <div class="bar-rows" id="ob-by-reply"></div>
+          </div>
+        </div>
+        <div class="foot"><span class="foot-note">Outbound Performance &amp; Activity</span></div>
+      </div>
+
+<!-- Modal -->
+      <div class="modal-overlay" id="ob-modal" onclick="if(event.target===this)this.classList.remove('open')">
+        <div class="modal">
+          <div class="modal-head">
+            <div><h3>How our outbound model works</h3><p>A structured, disciplined approach to pipeline generation</p></div>
+            <button class="modal-close" onclick="document.getElementById('ob-modal').classList.remove('open')">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="modal-block"><h4>What is a sequence?</h4><p>A sequence is a curated list of ICP-aligned contacts enrolled in a structured 10-week outreach cadence. Each sequence is purpose-built for a specific seller's target accounts or an independent hunting motion like Procurement or Lost Opps.</p></div>
+            <hr class="modal-divider">
+            <div class="modal-block"><h4>What each sequence contains</h4><p>Every week, for each contact in the sequence, the BDR executes three touches:</p><div class="modal-pills"><span class="modal-pill" style="background:#D6EEFF;color:#007DFF">1 personalized email</span><span class="modal-pill" style="background:#E0FAF5;color:#004D3D">1 LinkedIn touchpoint</span><span class="modal-pill" style="background:#FDEADF;color:#D94806">1 outbound call</span></div><p style="margin-top:10px">That's 10 emails, 10 LinkedIn touchpoints, and 10 calls per contact over the course of the sequence.</p></div>
+            <hr class="modal-divider">
+            <div class="modal-block"><h4>How BDRs structure their week</h4><p>Each BDR runs a maximum of 2 active sequences simultaneously. Two days per week are dedicated exclusively to sequence work — one day for emails and LinkedIn, another for calls. The remaining three days are reserved for Digital, Events, and S7 Ops pipeline nurturing, alongside daily inbound qualification and NDA handling.</p></div>
+            <hr class="modal-divider">
+            <div class="modal-block"><h4>When a meeting gets booked</h4><p>The seller is always the first to know. The BDR creates the opportunity in <strong>Stage 7</strong> in Salesforce. If the meeting outcome is positive, the seller accepts and the BDR moves it to <strong>Stage 6</strong>. If not conclusive, the BDR continues nurturing in Stage 7.</p></div>
+            <hr class="modal-divider">
+            <div class="modal-block"><h4>What happens at week 10</h4><p>If no meeting is booked after 10 weeks, the full contact list is handed to Growth Marketing for enrollment in the Always-On campaign.</p></div>
+          </div>
+        </div>
+
+    </div><!-- #ob -->
+  </div><!-- .sh-panel ob -->
+
+</div><!-- .sh-content -->
+
+<!-- ── Shell footer ── -->
+<footer class="sh-foot">
+  <div class="sh-foot-meta">
+    <div class="sh-foot-item" data-r="ib">
+      <span class="sh-foot-dot"></span>
+      <span class="sh-foot-label">Inbound</span>
+      <span>Updated Jun 30, 2026</span>
+    </div>
+    <div class="sh-foot-item" data-r="ob">
+      <span class="sh-foot-dot"></span>
+      <span class="sh-foot-label">Outbound</span>
+      <span>Updated Jun 30, 2026</span>
+    </div>
+  </div>
+  <div class="sh-foot-copy">Pre-Sales Team · TTEC</div>
+</footer>
+
+<!-- ── Shell JS ── -->
+<script>
+function shSwitch(tab) {
+  document.querySelectorAll('.sh-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.sh-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
+}
+</script>
+
+<!-- ── Inbound JS ── -->
+<script>
+(function() {
+  'use strict';
+  var DATA = [{"date": "2026-03-04", "month": "2026-03", "company": "Marcus Evans", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Mveliso Duda | Lead | Salesforce", "notes": "Opp - Close Lost - Partnership Opp"}, {"date": "2026-03-04", "month": "2026-03", "company": "Inovalon", "vertical": "Healthcare", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": "Brad Lindemann", "nda": "In Process", "sf": "Brom Stevens | Contact | Salesforce", "notes": "Lost opp - Too Small"}, {"date": "2026-03-05", "month": "2026-03", "company": "FREE NOW", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Didier Galvis | Contact | Salesforce", "notes": "Passed to digital"}, {"date": "2026-03-05", "month": "2026-03", "company": "Fossil Group", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "RFP", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "Jon Stough", "nda": null, "sf": "Teresa Watt | Contact | Salesforce", "notes": "Opp - Jon Stough"}, {"date": "2026-03-06", "month": "2026-03", "company": "Calstar", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "John Dzeima | Contact | Salesforce", "notes": "Not interested"}, {"date": "2026-03-09", "month": "2026-03", "company": "The Adler Fund", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Adam Adler | Lead | Salesforce", "notes": "DQL"}, {"date": "2026-03-09", "month": "2026-03", "company": "Phoenix Growth Strategies", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "RFI", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Brooke Ivey | Contact | Salesforce", "notes": "Waiting for the prospects signature"}, {"date": "2026-03-09", "month": "2026-03", "company": "Corpay", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Jack Harden | Contact | Salesforce", "notes": "Opp - seller not assigned yet"}, {"date": "2026-03-09", "month": "2026-03", "company": "AbbVie Inc", "vertical": "Healthcare", "bdr": "Ramiro", "type": "RFP", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "Brad Lindemann", "nda": null, "sf": "Kimberly Wilson | Contact | Salesforce", "notes": "Opp lost, TTEC NOT selected as finalist. No longer being considered for OneHub RFP"}, {"date": "2026-03-09", "month": "2026-03", "company": "Federon Procurement Solutions", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "RFP", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "shanza tariq | Contact | Salesforce", "notes": "Dead line passed"}, {"date": "2026-03-10", "month": "2026-03", "company": "Endava", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Nives Nadoh | Lead | Salesforce", "notes": "Lost opp"}, {"date": "2026-03-11", "month": "2026-03", "company": "Bird", "vertical": "Travel & Retail", "bdr": "JC", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Sam Steiner | Contact | Salesforce", "notes": "Opp - Percepta will work on it - No need to re-assign"}, {"date": "2026-03-13", "month": "2026-03", "company": "Shiseido", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "RFI", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "AKRAM EL MAZOUNI | Contact | Salesforce", "notes": "RFI - Scott Fosdick"}, {"date": "2026-03-13", "month": "2026-03", "company": "Cruisebound", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Ayleen Perez | Lead | Salesforce", "notes": "DQL - Bad Timming"}, {"date": "2026-03-16", "month": "2026-03", "company": "MFFI", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Maria Robert | Lead | Salesforce", "notes": "Opp - Close Lost- Too small"}, {"date": "2026-03-16", "month": "2026-03", "company": "Collin Investment Partners LP", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Tsvi Bort | Lead | Salesforce", "notes": "Not interested"}, {"date": "2026-03-16", "month": "2026-03", "company": "Ironclad", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Ashley Caputo | Lead | Salesforce", "notes": "Opp - Leslie and Marjie declined"}, {"date": "2026-03-17", "month": "2026-03", "company": "Hubib", "vertical": "BFSI", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Godmy Cabrera Ramirez | Lead | Salesforce", "notes": "Opp - Ray"}, {"date": "2026-03-18", "month": "2026-03", "company": "Department of Homeland Security", "vertical": "Public Sector", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Dwight Adams | Contact | Salesforce", "notes": "Opp - Dan Cruice"}, {"date": "2026-03-19", "month": "2026-03", "company": "Crimsonlogic", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "marijave bautista | Lead | Salesforce", "notes": "DQL"}, {"date": "2026-03-20", "month": "2026-03", "company": "Canadapost-Postescanada", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "RFP", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Nancy Degannes", "notes": "Handover with Ruthann"}, {"date": "2026-03-23", "month": "2026-03", "company": "Inverto (BCG)", "vertical": "RevGen", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Marie Westerman | Contact | Salesforce", "notes": "Will include TTEC in the supplier list"}, {"date": "2026-03-24", "month": "2026-03", "company": "BHPE LLC", "vertical": "BFSI", "bdr": "Hugo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Beckie Jackson | Lead | Salesforce", "notes": "No response"}, {"date": "2026-03-24", "month": "2026-03", "company": "Global Shop", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Jeff O'Halloran | Lead | Salesforce", "notes": "Opp - RuthAnn"}, {"date": "2026-03-24", "month": "2026-03", "company": "Region of Durham (RFQ)", "vertical": "Public Sector", "bdr": "Alfredo", "type": "RFP", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Junaid Sarwar | Lead | Salesforce", "notes": "RFQ - Dan"}, {"date": "2026-03-25", "month": "2026-03", "company": "UST", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "https://ttec.lightning.force.com/lightning/r/Contact/003Pl00001ILgNxIAL/view", "notes": "UPDATE"}, {"date": "2026-03-25", "month": "2026-03", "company": "Comarch", "vertical": "TMC", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "https://ttec.lightning.force.com/lightning/r/Lead/00QPl000012cLubMAE/view", "notes": "Opp - Leslie declined"}, {"date": "2026-03-25", "month": "2026-03", "company": "Dignified Days", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "https://ttec.lightning.force.com/lightning/r/Lead/00QPl000012drZ3MAI/view", "notes": "No response from the prospect"}, {"date": "2026-03-30", "month": "2026-03", "company": "AT&T", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Ashley Hurst | Contact | Salesforce", "notes": "Opp - Scott"}, {"date": "2026-03-31", "month": "2026-03", "company": "Roar CX", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Simone Armenio | Lead | Salesforce", "notes": "Pending Leslie assignment"}, {"date": "2026-03-31", "month": "2026-03", "company": "Medical Mutual", "vertical": "Healthcare", "bdr": "Hugo", "type": "RFP", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Brianna Ni | Contact | Salesforce", "notes": "RFP - Brad"}, {"date": "2026-04-01", "month": "2026-04", "company": "Xiaomi Inc", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Ling Dong | Contact | Salesforce", "notes": "Opp - Mason Jones"}, {"date": "2026-04-02", "month": "2026-04", "company": "American Tower", "vertical": "TMC", "bdr": "Ramiro", "type": "RFP", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Cody McCormick | Contact | Salesforce", "notes": "RFP - Waiting for NDA"}, {"date": "2026-04-02", "month": "2026-04", "company": "Dolce & Gabbana Japan", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Ikue Hirano | Lead | Salesforce", "notes": "Opp - Jon Stough"}, {"date": "2026-04-03", "month": "2026-04", "company": "Green Shield Canada", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Tanya McLean | Contact | Salesforce", "notes": "Opp - Brad"}, {"date": "2026-04-03", "month": "2026-04", "company": "TRUE Community Credit Union", "vertical": "BFSI", "bdr": "Alfredo", "type": "RFP", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Julienn Williams | Lead | Salesforce", "notes": "UPDATE"}, {"date": "2026-04-08", "month": "2026-04", "company": "PlanHealthAI", "vertical": "TMC", "bdr": "Hugo", "type": "RFP", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Simon Henry | Lead | Salesforce", "notes": "RFP - Dan"}, {"date": "2026-04-09", "month": "2026-04", "company": "ShareMatch", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Paul Phillpot | Lead | Salesforce", "notes": "Oportunity too small"}, {"date": "2026-04-09", "month": "2026-04", "company": "TEMU", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Vivian Yin | Lead | Salesforce", "notes": "Opp - Ray"}, {"date": "2026-04-09", "month": "2026-04", "company": "Umony", "vertical": "BFSI", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Julian Morgan | Lead | Salesforce", "notes": "Company too small"}, {"date": "2026-04-13", "month": "2026-04", "company": "DC Center llc", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "daniel coal | Lead | Salesforce", "notes": "Agility declined"}, {"date": "2026-04-13", "month": "2026-04", "company": "Sonim Technologies/NEXA", "vertical": "TMC", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Sean Savery | Lead | Salesforce", "notes": "Received their NDA"}, {"date": "2026-04-14", "month": "2026-04", "company": "Nigerian Air Force", "vertical": "Public Sector", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "David Omotayo Otitolaye | Lead | Salesforce", "notes": "Will send the RFI"}, {"date": "2026-04-14", "month": "2026-04", "company": "PWX Solutions", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Vicki Gambon | Lead | Salesforce", "notes": "Opp - Close Lost- Too small"}, {"date": "2026-04-14", "month": "2026-04", "company": "Epicor Software Corporation", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Josette Holte | Contact | Salesforce", "notes": "Referred to Digital"}, {"date": "2026-04-15", "month": "2026-04", "company": "Festo", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Laureen Clewing | Lead | Salesforce", "notes": "Opp - Ray"}, {"date": "2026-04-16", "month": "2026-04", "company": "SBI Card", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Sunil Kumar | Contact | Salesforce", "notes": "DQL - India to India"}, {"date": "2026-04-16", "month": "2026-04", "company": "Nutrium", "vertical": "Healthcare", "bdr": "Hugo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Patrícia Vale | Lead | Salesforce", "notes": "Agility declined"}, {"date": "2026-04-16", "month": "2026-04", "company": "EssilorLuxottica", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Alex Mowry | Lead | Salesforce", "notes": "Opp - Jon Stough"}, {"date": "2026-04-16", "month": "2026-04", "company": "ZEISS International", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Patricia Rodriguez | Contact | Salesforce", "notes": "Will share some internal info"}, {"date": "2026-04-16", "month": "2026-04", "company": "Sandow", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Keith Clements | Lead | Salesforce", "notes": "Rami is working this one"}, {"date": "2026-04-16", "month": "2026-04", "company": "UBIUM", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Oscar Ivan Flores Lucas | Contact | Salesforce", "notes": "Working Internally - Will send questions to the prospect"}, {"date": "2026-04-21", "month": "2026-04", "company": "GrowXpo Inc.", "vertical": "Healthcare", "bdr": "Ramiro", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "KYLE WORSLEY | Lead | Salesforce", "notes": "Pending Leslie assignment"}, {"date": "2026-04-21", "month": "2026-04", "company": "Wellness Lab", "vertical": "Healthcare", "bdr": "Hugo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Ahmed Rafaat | Lead | Salesforce", "notes": "No response yet"}, {"date": "2026-04-23", "month": "2026-04", "company": "Amberstone Digital Solutions Corporation", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Rao Chelli | Lead | Salesforce", "notes": "Partnership"}, {"date": "2026-04-23", "month": "2026-04", "company": "Hard Rock International/Seminole Hard Rock Support Services", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Joseph Williams | Contact | Salesforce", "notes": "Opp - RuthAnn"}, {"date": "2026-04-24", "month": "2026-04", "company": "Hydra Portugal", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Marcio Lemos | Lead | Salesforce", "notes": "Opp - RevGen"}, {"date": "2026-04-24", "month": "2026-04", "company": "Corteva", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Isabela Ramires | Lead | Salesforce", "notes": "Asked for a meeting for"}, {"date": "2026-04-24", "month": "2026-04", "company": "Claro", "vertical": "TMC", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Mayra Sanchez | Lead | Salesforce", "notes": "Signing NDAs"}, {"date": "2026-04-27", "month": "2026-04", "company": "[24]7 Customer, Inc.", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Pranav Bijwe | Contact | Salesforce", "notes": "No response"}, {"date": "2026-04-28", "month": "2026-04", "company": "Independence Pet Holdings", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Melania Sancho | Lead | Salesforce", "notes": "Opp - Michael Racz"}, {"date": "2026-04-28", "month": "2026-04", "company": "Pinnacle Group", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Emily Hall | Contact | Salesforce", "notes": "Opp - Michael Racz"}, {"date": "2026-04-28", "month": "2026-04", "company": "Legnetix", "vertical": "Public Sector", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Vickie Dewey | Lead | Salesforce", "notes": "Opp - Dan Cruice"}, {"date": "2026-04-29", "month": "2026-04", "company": "Gartner, Inc.", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Rick Squires | Contact | Salesforce", "notes": "RFP - Dan"}, {"date": "2026-04-30", "month": "2026-04", "company": "Guardian Service", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Lily Revels | Lead | Salesforce", "notes": "Opp - Brad"}, {"date": "2026-04-30", "month": "2026-04", "company": "El Paso Electric Company", "vertical": "Public Sector", "bdr": "Ramiro", "type": "RFP", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "Michael Racz", "nda": "Not Required", "sf": "El Paso Electric Company | Client | Salesforce", "notes": "Lost Opp - Location"}, {"date": "2026-05-04", "month": "2026-05", "company": "Federal Emergency Management Agency (FEMA)", "vertical": "Public Sector", "bdr": "Hugo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "Dan Cruice", "nda": null, "sf": "ALEXANDRA COOK | Contact | Salesforce", "notes": "6/25  Opp Closed Lost, contract terms "}, {"date": "2026-05-05", "month": "2026-05", "company": "Aldar International for Governance Consultancy", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Hasan Hideb | Lead | Salesforce", "notes": "6/23   Company too Small"}, {"date": "2026-05-06", "month": "2026-05", "company": "L.A. Care Health Plan", "vertical": "Healthcare", "bdr": "Ramiro", "type": "Lead", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": "Brad Lindemann", "nda": "Not Required", "sf": "Tiffany Kobashigawa | Contact | Salesforce", "notes": ""}, {"date": "2026-05-07", "month": "2026-05", "company": "Sélection Reader’s Digest", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "Lead", "status": "Disqualified", "sellerStatus": "Assigned", "seller": "Ryan Nichols", "nda": "Not Required", "sf": "M. Hanno Schwarzenegger | Lead | Salesforce", "notes": "6/25  Opp Closed Lost, disquilified by Revgen team"}, {"date": "2026-05-07", "month": "2026-05", "company": "Sistemas Tecnológicos Vextron", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Víctor Huerta | Lead | Salesforce", "notes": "Request for facilities  (No opp)"}, {"date": "2026-05-07", "month": "2026-05", "company": "Pacsun", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Joshua Allen | Lead | Salesforce", "notes": "6/23   No response yet"}, {"date": "2026-05-07", "month": "2026-05", "company": "Leadtech Group", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "RFI", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "Brian Leeson", "nda": null, "sf": "Procurement Agent | Lead | Salesforce", "notes": "6/25  Opp Closed Lost, Client Withdrew"}, {"date": "2026-05-12", "month": "2026-05", "company": "Oliver Wyman ME", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Ashley Shaw | Contact | Salesforce", "notes": "Replied and looking for meeting"}, {"date": "2026-05-12", "month": "2026-05", "company": "nClouds, Inc", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "Referred to Digital", "sellerStatus": null, "seller": null, "nda": null, "sf": "Garima Gupta | Lead | Salesforce", "notes": "6/30 Digital partnership Opp"}, {"date": "2026-05-12", "month": "2026-05", "company": "Naga", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Teodor Teslovan | Lead | Salesforce", "notes": "Ask for RevGen opinion "}, {"date": "2026-05-13", "month": "2026-05", "company": "PagAmerican", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Eduardo Sother | Lead | Salesforce", "notes": "6/30 Opp Closed lost - Opp too small"}, {"date": "2026-05-14", "month": "2026-05", "company": "Robertson Marketing Group", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": "In Process", "sf": "Tyler Goldston | Lead | Salesforce", "notes": "6/30 Waiting NDA"}, {"date": "2026-05-14", "month": "2026-05", "company": "Apple Inc.", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "RuthAnn Sparacio", "nda": null, "sf": "Reed Slinger | Contact | Salesforce", "notes": "Opp - RuthAnn"}, {"date": "2026-05-19", "month": "2026-05", "company": "United Nations World Food Program", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "RFP", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": "Dan Cruice", "nda": null, "sf": "Yara Ghanem | Contact | Salesforce", "notes": "6/30 Waiting for launch RFP"}, {"date": "2026-05-19", "month": "2026-05", "company": "Lufthansa Group", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "RFP", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "RuthAnn Sparacio", "nda": null, "sf": "Zara Mercedes Schmitz | Contact | Salesforce", "notes": "6/30  RFP Submitted"}, {"date": "2026-05-20", "month": "2026-05", "company": "Accenture Interactive", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "RFI", "status": "Referred to Digital", "sellerStatus": "Assigned", "seller": "Mason Jones", "nda": "Signed", "sf": "Leonor Coelho | Contact | Salesforce", "notes": "6/30  Will need to submit our response by July 3rd."}, {"date": "2026-05-21", "month": "2026-05", "company": "Rheem", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "Michael Racz", "nda": null, "sf": "Jamie Pelham | Contact | Salesforce", "notes": "Opp - Michael Racz"}, {"date": "2026-05-22", "month": "2026-05", "company": "Wallbid", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "MARIA GIANNOUSA | Lead | Salesforce", "notes": "Bad Timing  - Follow up in the coming months"}, {"date": "2026-05-25", "month": "2026-05", "company": "Buburuza Corp", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Michael Dank | Lead | Salesforce", "notes": "No show and no response "}, {"date": "2026-05-27", "month": "2026-05", "company": "Aware Health", "vertical": "TMC", "bdr": "Ramiro", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Janet Delgado | Lead | Salesforce", "notes": "6/30 Opp too small"}, {"date": "2026-05-27", "month": "2026-05", "company": "Picture Keeper", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Dustin Wilson | Lead | Salesforce", "notes": "6/30 Opp closed Lost - Too small"}, {"date": "2026-05-27", "month": "2026-05", "company": "BC Transit", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "RFP", "status": "Referred to Digital", "sellerStatus": null, "seller": null, "nda": null, "sf": "Muriel Modder | Lead | Salesforce", "notes": "6/30 Passed to digital"}, {"date": "2026-05-28", "month": "2026-05", "company": "YanGo", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "RFP", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": "Ray Klostermann", "nda": "Not Required", "sf": "Vladimir Sharonov | Lead | Salesforce", "notes": "6/30 Opp Stage 3"}, {"date": "2026-05-28", "month": "2026-05", "company": "Electric AI", "vertical": "TMC", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Katie Freeman | Lead | Salesforce", "notes": "6/30 Client move forward with another company"}, {"date": "2026-05-28", "month": "2026-05", "company": "Correos de Costa Rica", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "RFP", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Dalia Urbina Ríos | Contact | Salesforce", "notes": "6/30 Opp Closed lost "}, {"date": "2026-05-28", "month": "2026-05", "company": "Polymarket", "vertical": "BFSI", "bdr": "Ramiro", "type": "Lead", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": "Tommy Samuels", "nda": null, "sf": "Zachary Ricklin | Lead | Salesforce", "notes": "6/30  Opp closed Lost - unresponsive prospect"}, {"date": "2026-06-01", "month": "2026-06", "company": "SHBA Capital LLC", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Robert McDuff | Lead | Salesforce", "notes": "Bad contact Info"}, {"date": "2026-06-02", "month": "2026-06", "company": "Compassion International", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "RFP", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Kimberly Wolfe | Lead | Salesforce", "notes": "6/ 30 Opp Lost - Too Small"}, {"date": "2026-06-02", "month": "2026-06", "company": "Protiviti", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "Lead", "status": "Disqualified", "sellerStatus": null, "seller": null, "nda": null, "sf": "Turkan Bayramova | Lead | Salesforce", "notes": "6/30 DQL No response"}, {"date": "2026-06-03", "month": "2026-06", "company": "Midea", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": "Scott Fodsick", "nda": "Not Required", "sf": "Daryl Dice | Contact | Salesforce", "notes": "Transferred to Agility - Scott said it was too small"}, {"date": "2026-06-05", "month": "2026-06", "company": "MVL Chain", "vertical": "TMC", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": "Assigned", "seller": "Ray Klostermann", "nda": null, "sf": "Wai Kwong Yong | Lead | Salesforce", "notes": "6/30 Requested time to discuss and take next steps"}, {"date": "2026-06-09", "month": "2026-06", "company": "Included Health", "vertical": "Healthcare", "bdr": "Hugo", "type": "Lead", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "Brad Lindemann", "nda": "Signed", "sf": "Tracy Wong | Lead | Salesforce", "notes": "6/30 RFI sent"}, {"date": "2026-06-09", "month": "2026-06", "company": "WeWork Companies", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "RFP", "status": "No Meeting Required", "sellerStatus": null, "seller": null, "nda": null, "sf": "Pedja Kresevljakovic | Lead | Salesforce", "notes": "Waiting fon RFP launch June 22"}, {"date": "2026-06-09", "month": "2026-06", "company": "Atheneum Partners GmBH", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "RFP", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Howard Tiegel | Lead | Salesforce", "notes": "6/30 Sending follow up "}, {"date": "2026-06-09", "month": "2026-06", "company": "Covered Insurance Solutions", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": "Tommy Samuels", "nda": null, "sf": "Christopher Keeney | Contact | Salesforce", "notes": "Opp - Tommy Samuels"}, {"date": "2026-06-11", "month": "2026-06", "company": "EROAD Philippines", "vertical": "TMC", "bdr": "Hugo", "type": "Lead", "status": "Referred to Digital", "sellerStatus": null, "seller": null, "nda": null, "sf": "Antonio Ricafort | Lead | Salesforce", "notes": "6/30 Referred to Digital "}, {"date": "2026-06-11", "month": "2026-06", "company": "Telfar", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "Lead", "status": "Referred to Digital", "sellerStatus": null, "seller": null, "nda": null, "sf": "Emily Cooper | Lead | Salesforce", "notes": "6/30 Referred to Digital "}, {"date": "2026-06-11", "month": "2026-06", "company": "Evergo", "vertical": "Automotive", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Ámbar Ubiera | Lead | Salesforce", "notes": "Second email sent"}, {"date": "2026-06-12", "month": "2026-06", "company": "BMW Group United Kingdom", "vertical": "Automotive", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": "Assigned", "seller": "RuthAnn Sparacio", "nda": null, "sf": "Ankur Pandit | Contact | Salesforce", "notes": "6/30 Working through RFP Due July 9"}, {"date": "2026-06-15", "month": "2026-06", "company": "National Grid USA", "vertical": "Public Sector", "bdr": "Hugo", "type": "RFI", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "RuthAnn Sparacio", "nda": null, "sf": "Jennifer Schultz | Contact | Salesforce", "notes": "6/30 Waiting for a new RFI"}, {"date": "2026-06-16", "month": "2026-06", "company": "CultureX", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Megha Jonwal | Lead | Salesforce", "notes": "First Touch sent"}, {"date": "2026-06-17", "month": "2026-06", "company": "Stanley", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "RFI", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": null, "nda": null, "sf": "Fernando Silva | Lead | Salesforce", "notes": "6/24 - RFI delivered by Rebe"}, {"date": "2026-06-18", "month": "2026-06", "company": "Suzuki", "vertical": "Automotive", "bdr": "Ramiro", "type": "Lead", "status": "Meeting Held", "sellerStatus": "Assigned", "seller": "Paul Feder", "nda": null, "sf": "Lisa Tickle | Lead | Salesforce", "notes": "6/30 Handover  Done"}, {"date": "2026-06-18", "month": "2026-06", "company": "Southwest Airlines", "vertical": "Travel & Retail", "bdr": "Hugo", "type": "RFI", "status": "No Meeting Required", "sellerStatus": "Assigned", "seller": "Brent Loggings", "nda": "Signed", "sf": "Alison Vanderpoel | Contact | Salesforce", "notes": "6/30  Waiting RFP"}, {"date": "2026-06-19", "month": "2026-06", "company": "Red Ventures", "vertical": "Travel & Retail", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": "Assigned", "seller": "Mason Jones", "nda": "Not Required", "sf": "Matt Williams | Contact | Salesforce", "notes": "First Touch sent"}, {"date": "2026-06-19", "month": "2026-06", "company": "Wister", "vertical": "TMC", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Alexandre Cirille | Lead | Salesforce", "notes": "First Touch sent"}, {"date": "2026-06-23", "month": "2026-06", "company": "Ataway", "vertical": "TMC", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Damian Jankowski | Lead | Salesforce", "notes": "6/30 Second email sent"}, {"date": "2026-06-23", "month": "2026-06", "company": "Canopius Asia", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Faye Wong | Lead | Salesforce", "notes": ""}, {"date": "2026-06-24", "month": "2026-06", "company": "Treya Partners", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "Partner", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Arnav Verma | Lead | Salesforce", "notes": "6/30 Pending discovery call "}, {"date": "2026-06-24", "month": "2026-06", "company": "CDPHP", "vertical": "Healthcare", "bdr": "Alfredo", "type": "Lead", "status": "Scheduled", "sellerStatus": "Assigned", "seller": "Billy Spegal", "nda": null, "sf": "Anthony Thompson | Contact | Salesforce", "notes": "6/30 Meeting scheduled July/2"}, {"date": "2026-06-24", "month": "2026-06", "company": "Catalonia Hotels & Resorts", "vertical": "Travel & Retail", "bdr": "Ramiro", "type": "RFP", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Isabel Vallet | Lead | Salesforce", "notes": "6/ 30 Opp Lost - Too Small"}, {"date": "2026-06-24", "month": "2026-06", "company": "PalmFinance Inc", "vertical": "BFSI", "bdr": "Alfredo", "type": "Lead", "status": "Meeting Held", "sellerStatus": null, "seller": null, "nda": null, "sf": "Diego Mesa | Lead | Salesforce", "notes": "6/30 Waiting for their NDA and information on volumes "}, {"date": "2026-06-29", "month": "2026-06", "company": "MSG Plaut", "vertical": "TMC", "bdr": "Ramiro", "type": "Partner", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Andrei Pompile | Lead | Salesforce", "notes": ""}, {"date": "2026-06-29", "month": "2026-06", "company": "Wellmedr", "vertical": "Healthcare", "bdr": "Hugo", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Emmanuel Carnero | Lead | Salesforce", "notes": ""}, {"date": "2026-06-30", "month": "2026-06", "company": "Arium Networks", "vertical": "TMC", "bdr": "Ramiro", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Michael Collins | Lead | Salesforce", "notes": ""}, {"date": "2026-06-30", "month": "2026-06", "company": "The Energy and Water Ombudsman Victoria (EWOV)", "vertical": "Public Sector", "bdr": "Hugo", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "Erin Mitchell | Lead | Salesforce", "notes": ""}, {"date": "2026-06-30", "month": "2026-06", "company": "—", "vertical": "TMC", "bdr": "Monica", "type": "Lead", "status": "No Meeting Yet", "sellerStatus": null, "seller": null, "nda": null, "sf": "", "notes": "No inbound activity yet"}];
+
+  var STATUS_ORDER = ['No Meeting Yet','Scheduled','Meeting Held','No Meeting Required','Referred to Digital','Disqualified'];
+  var STATUS_COLORS = {'No Meeting Yet':'#FCA941','Scheduled':'#007DFF','Meeting Held':'#5CECD3','No Meeting Required':'#9AA3B0','Referred to Digital':'#6E6196','Disqualified':'#D94806'};
+  var VERTS = ['Healthcare','Public Sector','BFSI','TMC','Automotive','Travel & Retail','RevGen'];
+  var TYPES = ['Lead','RFI','RFP','Partner'];
+  var BDRS = [...new Set(DATA.map(d => d.bdr).filter(Boolean))].filter(b => b !== 'JC').sort();
+  var activeBdr = 'all';
+
+  function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+  function fmt(m) { var p = m.split('-'); return new Date(p[0], p[1]-1, 1).toLocaleString('en', {month:'long',year:'numeric'}); }
+  function pad(n) { return n < 10 ? '0'+n : ''+n; }
+  function parseD(s) { var a = s.split('-').map(Number); return new Date(a[0], a[1]-1, a[2]); }
+  function quarterKey(s) { var a = s.split('-').map(Number); return a[0]+'-Q'+Math.ceil(a[1]/3); }
+  function qLabel(q) { var a = q.split('-'); return a[1]+' '+a[0]; }
+  function isoMonday(s) { var d = parseD(s); var off = (d.getDay()+6)%7; d.setDate(d.getDate()-off); return d; }
+  function weekKey(s) { var m = isoMonday(s); return m.getFullYear()+'-'+pad(m.getMonth()+1)+'-'+pad(m.getDate()); }
+  function weekLabel(k) { var d = parseD(k); var e = new Date(d); e.setDate(d.getDate()+4); var f = x => x.toLocaleString('en',{month:'short',day:'numeric'}); return 'Week of '+f(d)+' – '+f(e); }
+  function count(a, k) { var m = {}; a.forEach(x => { var v = x[k]||'(blank)'; m[v]=(m[v]||0)+1; }); return m; }
+  function dqBucket(n) {
+    n = (n||'').toLowerCase();
+    if(/passed to digital|to digital/.test(n)) return 'Passed to Digital';
+    if(/not interested|declin|not a fit|too small/.test(n)) return 'Not a fit / declined';
+    if(/close lost|lost opp|^opp/.test(n)) return 'Opp lost';
+    if(/no response|cold|dead ?line|deadline/.test(n)) return 'No response / lapsed';
+    if(/timing|timming|not now/.test(n)) return 'Timing';
+    if(/partner|vendor|supplier|include ttec/.test(n)) return 'Not a sales opp';
+    if(/dql/.test(n)) return 'Unspecified (DQL)';
+    return 'Other';
+  }
+
+  var gran = document.getElementById('ib-gran');
+  var per  = document.getElementById('ib-per');
+
+  function periodsFor(g) {
+    if(g==='month') return [...new Set(DATA.map(d=>d.month))].sort().map(m=>[m,fmt(m)]);
+    if(g==='quarter') return [...new Set(DATA.map(d=>quarterKey(d.date)))].sort().map(q=>[q,qLabel(q)]);
+    if(g==='week') return [...new Set(DATA.map(d=>weekKey(d.date)))].sort().map(k=>[k,weekLabel(k)]);
+    return [];
+  }
+  function populatePer() {
+    var g = gran.value;
+    if(g==='all') { per.style.display='none'; per.innerHTML=''; return; }
+    per.style.display='';
+    var opts = periodsFor(g);
+    per.innerHTML = opts.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');
+    if(opts.length) per.value = opts[opts.length-1][0];
+  }
+  function currentRows() {
+    var g=gran.value, p=per.value, rows=DATA;
+    if(g==='month') rows=rows.filter(d=>d.month===p);
+    else if(g==='quarter') rows=rows.filter(d=>quarterKey(d.date)===p);
+    else if(g==='week') rows=rows.filter(d=>weekKey(d.date)===p);
+    if(activeBdr!=='all') rows=rows.filter(d=>d.bdr===activeBdr);
+    return rows;
+  }
+  function periodLabel() {
+    var g=gran.value, p=per.value;
+    if(g==='quarter') return 'Showing <b>'+qLabel(p)+'</b>';
+    if(g==='month') return 'Showing <b>'+fmt(p)+'</b>';
+    if(g==='week') return 'Showing <b>'+weekLabel(p)+'</b>';
+    return 'Showing <b>all periods</b> · Mar–Jun 2026';
+  }
+
+  function buildBdrBtns() {
+    var c = document.getElementById('ib-bdr-btns');
+    c.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center';
+    function mk(label, val) {
+      var b = document.createElement('button');
+      b.className = 'bdr-btn'+(val==='all'?' active':'');
+      b.textContent = label; b.dataset.bdr = val;
+      b.onclick = () => {
+        activeBdr = val;
+        document.getElementById('ib-bdr-btns').querySelectorAll('.bdr-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.bdr===val));
+        render();
+      };
+      c.appendChild(b);
+    }
+    mk('All BDRs','all');
+    BDRS.forEach(b => mk(b, b));
+  }
+
+  function barRows(id, keys, map, denom) {
+    var max = Math.max(1, ...keys.map(k=>map[k]||0));
+    document.getElementById(id).innerHTML = keys.map(k => {
+      var v = map[k]||0;
+      return `<div class="row"><div class="name">${k}</div><div class="bar"><i style="width:${v/max*100}%"></i></div><div class="val"><span class="abs">${v}</span><span class="sep"></span><span class="pc">${pct(v,denom)}%</span></div></div>`;
+    }).join('') || '<div class="note">No data for this period.</div>';
+  }
+
+  function render() {
+    var rows = currentRows(), total = rows.length;
+    var sc = count(rows,'status');
+    var held=sc['Meeting Held']||0, sched=sc['Scheduled']||0, dq=sc['Disqualified']||0;
+    var bdrLabel = activeBdr==='all' ? '' : ' · <b>'+activeBdr+'</b>';
+    document.getElementById('ib-period').innerHTML = periodLabel()+' · <b>'+total+'</b> lead'+(total===1?'':'s')+bdrLabel;
+
+    // KPIs
+    document.getElementById('ib-kpis').innerHTML = [
+      ['','Leads Assigned',total,'leads assigned this period'],
+      ['g','Conversion to meeting',pct(sched+held,total)+'%','of assigned reached a meeting'],
+      ['d','Disqualified',dq,pct(dq,total)+'% of assigned']
+    ].map(k=>`<div class="kpi ${k[0]}"><div class="cap">${k[1]}</div><div class="num${k[2]==='0'||k[2]===0?' zero':''}">${k[2]}</div><div class="sub">${k[3]}</div></div>`).join('');
+
+    // Donut
+    var R=80,CX=100,CY=100,SW=28,INNER=R-SW/2,CIRCUM=2*Math.PI*INNER;
+    var offset=0;
+    var segs = STATUS_ORDER.map(s=>{var v=sc[s]||0;var frac=total?v/total:0;var dash=frac*CIRCUM;var seg={s,v,frac,dash,offset};offset+=dash;return seg;});
+    var paths = segs.map(seg=>{
+      if(!seg.v) return '';
+      var gap=total>1?1:0;
+      return `<circle cx="${CX}" cy="${CY}" r="${INNER}" fill="none" stroke="${STATUS_COLORS[seg.s]}" stroke-width="${SW}" stroke-dasharray="${Math.max(0,seg.dash-gap)} ${CIRCUM-(Math.max(0,seg.dash-gap))}" stroke-dashoffset="${CIRCUM/4-seg.offset}" style="transition:stroke-dasharray .5s ease"/>`;
+    }).join('');
+    var legendRow = s => {var v=sc[s]||0;return `<div class="dl-row"><span class="dl-dot" style="background:${STATUS_COLORS[s]}"></span><span class="dl-label">${s}</span><span class="dl-val">${v}</span><span class="dl-sep">·</span><span class="dl-pct">${pct(v,total)}%</span></div>`;}
+    document.getElementById('ib-donut').innerHTML = `<div class="donut-wrap"><div class="donut-svg-wrap" style="width:200px;height:200px"><svg viewBox="0 0 200 200" width="200" height="200">${paths}</svg><div class="donut-center"><div class="dc-n">${total}</div><div class="dc-l">Total leads</div></div></div><div class="donut-divider"></div><div class="donut-legend">${STATUS_ORDER.slice(0,3).map(legendRow).join('')}</div><div class="donut-divider"></div><div class="donut-legend">${STATUS_ORDER.slice(3).map(legendRow).join('')}</div></div>`;
+
+    barRows('ib-by-type', TYPES, count(rows,'type'), total);
+    barRows('ib-by-vert', [...VERTS].sort(), count(rows,'vertical'), total);
+
+    // Seller assignment
+    var ss = count(rows,'sellerStatus');
+    document.getElementById('ib-sh-assigned').textContent = ss['Assigned']||0;
+    var sellerMap = {};
+    rows.forEach(r=>{ if(r.seller) sellerMap[r.seller]=(sellerMap[r.seller]||0)+1; });
+    var sk = Object.keys(sellerMap).sort((a,b)=>sellerMap[b]-sellerMap[a]);
+    var mkRow = s => `<div class="sl-row"><span class="sl-name">${esc(s)}</span><span class="sl-n">${sellerMap[s]}</span></div>`;
+    var listEl = document.getElementById('ib-seller-list');
+    if(sk.length===0) {
+      listEl.className='sh-two-col single-col';
+      document.getElementById('ib-seller-col1').innerHTML='<div class="sl-empty">No sellers assigned yet this period.</div>';
+    } else if(sk.length<=5) {
+      listEl.className='sh-two-col single-col';
+      document.getElementById('ib-seller-col1').innerHTML=sk.map(mkRow).join('');
+    } else {
+      listEl.className='sh-two-col';
+      var mid=Math.ceil(sk.length/2);
+      document.getElementById('ib-seller-col1').innerHTML=sk.slice(0,mid).map(mkRow).join('');
+      document.getElementById('ib-seller-col2').innerHTML=sk.slice(mid).map(mkRow).join('');
+    }
+
+    // NDA
+    var NDA_ACTIVE=['Submitted','In Process','Signed'];
+    var ndaMap=count(rows,'nda');
+    var ndaActive=NDA_ACTIVE.filter(k=>ndaMap[k]>0);
+    document.getElementById('ib-nda').innerHTML = ndaActive.length
+      ? ndaActive.map(k=>`<div class="nda-tile"><div class="nt-n">${ndaMap[k]}</div><div class="nt-l">${k}</div></div>`).join('')
+      : '<div class="sl-empty">No NDA activity this period.</div>';
+
+    // DQ reasons
+    var dqRows=rows.filter(r=>r.status==='Disqualified');
+    var db={};dqRows.forEach(r=>{var k=dqBucket(r.notes);db[k]=(db[k]||0)+1;});
+    barRows('ib-by-dq',Object.keys(db).sort((a,b)=>db[b]-db[a]),db,dqRows.length);
+
+    // Table
+    document.getElementById('ib-thead').innerHTML='<tr><th>Date</th><th>Company</th><th>Vertical</th><th>Type</th><th>Status</th><th>BDR</th><th>Seller</th></tr>';
+    var sorted=rows.slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
+    document.getElementById('ib-tcount').textContent=total+' lead'+(total===1?'':'s');
+    document.getElementById('ib-tbody').innerHTML=sorted.map(r=>`<tr><td class="dt">${esc(r.date)}</td><td class="co">${esc(r.company)}</td><td>${esc(r.vertical)}</td><td>${esc(r.type)}</td><td><span class="spill"><span class="pd" style="background:${STATUS_COLORS[r.status]||'var(--line)'}"></span>${esc(r.status)}</span></td><td>${esc(r.bdr)}</td><td>${r.seller?esc(r.seller):'<span class="dash">—</span>'}</td></tr>`).join('')
+      || '<tr><td colspan="7" class="dash">No leads in this period.</td></tr>';
+
+    // Print context
+    var g2=gran.value;
+    var perLabel=per.value&&per.options[per.selectedIndex]?per.options[per.selectedIndex].text:'';
+    var periodStr=perLabel?(g2==='all'?'All time':perLabel):'All time';
+    var pc=document.getElementById('ib-print-ctx');
+    if(pc) pc.innerHTML='BDR: <span>'+(activeBdr==='all'?'All BDRs':activeBdr)+'</span> · Period: <span>'+periodStr+'</span>';
+  }
+
+  gran.addEventListener('change', ()=>{ populatePer(); render(); });
+  per.addEventListener('change', render);
+  buildBdrBtns();
+  populatePer();
+  render();
+})();
+</script>
+
+<!-- ── Outbound JS ── -->
+<script>
+(function() {
+  'use strict';
+  var SEQUENCES = [{"bdr": "Monica", "name": "Monica — Outbound — — ", "type": "Outbound", "seller": "—", "totalContacts": 0, "currentWeek": 0, "status": "Planned", "meetingsBooked": 0, "prospectsActive": 0, "prospectsOpened": 0, "emailsDelivered": 0, "emailsReplies": 0}, {"bdr": "Monica", "name": "Monica — Hunting — — ", "type": "Hunting", "seller": "—", "totalContacts": 0, "currentWeek": 0, "status": "Planned", "meetingsBooked": 0, "prospectsActive": 0, "prospectsOpened": 0, "emailsDelivered": 0, "emailsReplies": 0}, {"bdr": "Hugo", "name": "Hugo — Outbound — — ", "type": "Outbound", "seller": "—", "totalContacts": 0, "currentWeek": 0, "status": "Planned", "meetingsBooked": 0, "prospectsActive": 0, "prospectsOpened": 0, "emailsDelivered": 0, "emailsReplies": 0}, {"bdr": "Hugo", "name": "Hugo — Hunting — — ", "type": "Hunting", "seller": "—", "totalContacts": 0, "currentWeek": 0, "status": "Planned", "meetingsBooked": 0, "prospectsActive": 0, "prospectsOpened": 0, "emailsDelivered": 0, "emailsReplies": 0}, {"bdr": "Alfredo", "name": "Alfredo — Outbound — — ", "type": "Outbound", "seller": "—", "totalContacts": 0, "currentWeek": 0, "status": "Planned", "meetingsBooked": 0, "prospectsActive": 0, "prospectsOpened": 0, "emailsDelivered": 0, "emailsReplies": 0}, {"bdr": "Alfredo", "name": "Alfredo — Hunting — — ", "type": "Hunting", "seller": "—", "totalContacts": 0, "currentWeek": 0, "status": "Planned", "meetingsBooked": 0, "prospectsActive": 0, "prospectsOpened": 0, "emailsDelivered": 0, "emailsReplies": 0}, {"bdr": "Ramiro", "name": "Rami - Outbound - Mike - RevGen", "type": "Outbound", "seller": "Mike", "totalContacts": 0, "currentWeek": 1, "status": "Planned", "meetingsBooked": 0, "prospectsActive": 0, "prospectsOpened": 0, "emailsDelivered": 0, "emailsReplies": 0}, {"bdr": "Ramiro", "name": "Ramiro — Hunting — — ", "type": "Hunting", "seller": "—", "totalContacts": 0, "currentWeek": 1, "status": "Planned", "meetingsBooked": 0, "prospectsActive": 0, "prospectsOpened": 0, "emailsDelivered": 0, "emailsReplies": 0}];
+  var activeBdr = 'all', activeType = 'all';
+  var BDRS = [...new Set(SEQUENCES.map(s=>s.bdr))].sort();
+  var TYPES = ['Outbound','Hunting'];
+
+  function pct(a,b) { return b?Math.round(a/b*100):0; }
+  function esc(s) { return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  function statusBadge(s) { var m={'Planned':'planned','In Progress':'active','Completed':'done','Blocked / Paused':'blocked'}; return `<span class="badge badge-${m[s]||'planned'}">${esc(s)}</span>`; }
+
+  function filtered() {
+    return SEQUENCES.filter(s=>(activeBdr==='all'||s.bdr===activeBdr)&&(activeType==='all'||s.type===activeType));
+  }
+
+  function renderKPIs(rows) {
+    var tm=rows.reduce((a,s)=>a+s.meetingsBooked,0);
+    var tc=rows.reduce((a,s)=>a+s.totalContacts,0);
+    var td=rows.reduce((a,s)=>a+s.emailsDelivered,0);
+    var tr=rows.reduce((a,s)=>a+s.emailsReplies,0);
+    document.getElementById('ob-kpis').innerHTML=[
+      ['accent-outbound','Active Sequences',rows.length,'sequences tracked'],
+      ['accent-green','Total Contacts',tc.toLocaleString(),'enrolled across all sequences'],
+      ['','Reply Rate',td?pct(tr,td)+'%':'—','replies ÷ emails delivered'],
+      ['accent-meeting','Meetings Booked',tm,'confirmed discovery calls'],
+    ].map(([cls,cap,num,sub])=>`<div class="kpi ${cls}"><div class="cap">${cap}</div><div class="num${num===0||num==='0'?' zero':''}">${num}</div><div class="sub">${sub}</div></div>`).join('');
+  }
+
+  function seqCard(s) {
+    var p=pct(s.currentWeek,10), rr=pct(s.emailsReplies,s.emailsDelivered), or=pct(s.prospectsOpened,s.totalContacts), isH=s.type==='Hunting';
+    return `<div class="seq-card">
+      <div class="seq-card-top"><div><div class="seq-name">${esc(s.name)}</div><div class="seq-meta">${esc(s.bdr)} · Seller: ${esc(s.seller)} · ${s.totalContacts} contacts</div></div><div class="seq-badges">${statusBadge(s.status)}</div></div>
+      <div class="prog-wrap"><div class="prog-row"><span class="prog-label">Sequence progress</span><span class="prog-val">${p}%</span></div><div class="prog-bar"><i class="${isH?'hunting':''}" style="width:${p}%"></i></div></div>
+      <div class="seq-stats"><div class="seq-stat"><div class="sv">${s.prospectsActive}</div><div class="sl">Active</div></div><div class="seq-stat"><div class="sv">${or?or+'%':'—'}</div><div class="sl">Open Rate</div></div><div class="seq-stat"><div class="sv">${rr?rr+'%':'—'}</div><div class="sl">Reply Rate</div></div><div class="seq-stat meeting"><div class="sv">${s.meetingsBooked}</div><div class="sl">Meetings</div></div></div>
+    </div>`;
+  }
+
+  function renderSections(rows) {
+    var ob=rows.filter(s=>s.type==='Outbound'), hu=rows.filter(s=>s.type==='Hunting');
+    document.getElementById('ob-outbound-section').innerHTML=(activeType==='all'||activeType==='Outbound')&&ob.length
+      ?`<div class="section outbound-section"><div class="section-head"><h2>Outbound Sequences</h2><span class="section-count">${ob.length} sequence${ob.length!==1?'s':''}</span></div><p class="note">Seller-aligned sequences targeting ICP accounts.</p><div class="seq-grid${ob.length===1?' single':''}">${ob.map(seqCard).join('')}</div></div>`:'';
+    document.getElementById('ob-hunting-section').innerHTML=(activeType==='all'||activeType==='Hunting')&&hu.length
+      ?`<div class="section hunting-section"><div class="section-head"><h2>Hunting Sequences</h2><span class="section-count">${hu.length} sequence${hu.length!==1?'s':''}</span></div><p class="note">Independent motions — Procurement Desk, Lost Opps, Zombie Leads, Digital cross-sell.</p><div class="seq-grid${hu.length===1?' single':''}">${hu.map(seqCard).join('')}</div></div>`:'';
+  }
+
+  function renderTable(rows) {
+    document.getElementById('ob-sum-thead').innerHTML='<tr><th>Sequence</th><th>BDR</th><th>Type</th><th>Status</th><th>Progress</th><th style="text-align:right">Contacts</th><th style="text-align:right">Active</th><th style="text-align:right">Replies</th><th style="text-align:right">Reply %</th><th style="text-align:right">Meetings</th></tr>';
+    document.getElementById('ob-sum-tbody').innerHTML=rows.map(s=>{
+      var p=pct(s.currentWeek,10),rr=pct(s.emailsReplies,s.emailsDelivered),isH=s.type==='Hunting';
+      return `<tr><td class="seq-col">${esc(s.name)}</td><td class="bdr-col">${esc(s.bdr)}</td><td><span class="badge badge-${s.type.toLowerCase()}">${esc(s.type)}</span></td><td>${statusBadge(s.status)}</td><td><div class="prog-inline"><div class="bar"><i class="${isH?'h':''}" style="width:${p}%"></i></div><span class="pct">${p}%</span></div></td><td class="num-cell">${s.totalContacts}</td><td class="num-cell">${s.prospectsActive}</td><td class="num-cell">${s.emailsReplies}</td><td class="num-cell">${s.emailsDelivered?rr+'%':'—'}</td><td class="meet-cell">${s.meetingsBooked}</td></tr>`;
+    }).join('')||'<tr><td colspan="10" style="color:var(--muted);padding:14px 10px">No sequences match this filter.</td></tr>';
+  }
+
+  function renderBDR(rows) {
+    var m={};
+    rows.forEach(s=>{if(!m[s.bdr])m[s.bdr]={contacts:0,delivered:0,replies:0};m[s.bdr].contacts+=s.totalContacts;m[s.bdr].delivered+=s.emailsDelivered;m[s.bdr].replies+=s.emailsReplies;});
+    document.getElementById('ob-by-bdr').innerHTML=Object.keys(m).sort().map(k=>`<div class="bdr-block"><div class="bdr-name">${esc(k)}</div><div class="bdr-metrics"><div class="bdr-metric"><div class="mv">${m[k].contacts.toLocaleString()}</div><div class="ml">Contacts</div></div><div class="bdr-metric"><div class="mv">${m[k].delivered.toLocaleString()}</div><div class="ml">Emails Sent</div></div><div class="bdr-metric"><div class="mv">${m[k].replies}</div><div class="ml">Replies</div></div></div></div>`).join('')||'<div style="color:var(--muted);font-size:12px">No data.</div>';
+  }
+
+  function renderReply(rows) {
+    var active=rows.filter(s=>s.emailsDelivered>0).map(s=>{var parts=s.name.split('—');return {name:parts.length>1?parts.slice(1).join('—').trim():s.name,rate:pct(s.emailsReplies,s.emailsDelivered)};}).sort((a,b)=>b.rate-a.rate);
+    var maxR=Math.max(1,...active.map(r=>r.rate));
+    document.getElementById('ob-by-reply').innerHTML=active.length
+      ?active.map(r=>`<div class="bar-row"><div class="bn">${esc(r.name)}</div><div class="bb"><i style="width:${r.rate/maxR*100}%;background:var(--outbound)"></i></div><div class="bv"><span class="abs">${r.rate}%</span></div></div>`).join('')
+      :'<div style="color:var(--muted);font-size:12px;padding:4px 0">No email data yet.</div>';
+  }
+
+  function renderPeriod(rows) {
+    var bn=activeBdr!=='all'?' · <b>'+activeBdr+'</b>':'', tn=activeType!=='all'?' · <b>'+activeType+'</b>':'';
+    document.getElementById('ob-period').innerHTML='Showing <b>'+rows.length+'</b> sequence'+(rows.length!==1?'s':'')+bn+tn;
+  }
+
+  function updatePrintCtx() {
+    var el=document.getElementById('ob-print-ctx');
+    if(el) el.innerHTML='BDR: <span>'+(activeBdr==='all'?'All BDRs':activeBdr)+'</span> · Type: <span>'+(activeType==='all'?'All types':activeType)+'</span>';
+  }
+
+  function render() {
+    var rows=filtered();
+    renderPeriod(rows); renderKPIs(rows); renderSections(rows);
+    renderTable(rows); renderBDR(rows); renderReply(rows);
+    updatePrintCtx();
+  }
+
+  function buildFilters() {
+    var bC=document.getElementById('ob-bdr-btns'), tC=document.getElementById('ob-type-btns');
+    function mk(cont,label,val,group) {
+      var b=document.createElement('button');
+      b.className='filter-btn'+(val==='all'?' active':'');
+      b.textContent=label; b.dataset.val=val;
+      b.onclick=()=>{
+        if(group==='bdr') activeBdr=val; else activeType=val;
+        var btnId=group==='bdr'?'ob-bdr-btns':'ob-type-btns';
+        document.getElementById(btnId).querySelectorAll('.filter-btn').forEach(x=>x.classList.toggle('active',x.dataset.val===val));
+        render();
+      };
+      cont.appendChild(b);
+    }
+    mk(bC,'All BDRs','all','bdr'); BDRS.forEach(b=>mk(bC,b,b,'bdr'));
+    mk(tC,'All','all','type'); TYPES.forEach(t=>mk(tC,t,t,'type'));
+  }
+
+  buildFilters();
+  render();
+})();
+</script>
+
+
+      <!-- Modal — lives at body level to avoid overflow clipping -->
+
+      </div>
+
+</body>
+</html>

@@ -481,7 +481,7 @@ body {
             <h1>Inbound Performance &amp; Activity</h1>
             <div class="topbar-ts">
               <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5V8l2.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              Updated Jul 6, 2026
+              Updated Jul 7, 2026
             </div>
             <div class="period" id="ib-period"></div>
             <div class="print-context" id="ib-print-ctx"></div>
@@ -571,7 +571,7 @@ body {
             <h1>Outbound Performance &amp; Activity</h1>
             <div class="topbar-ts">
               <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5V8l2.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              Updated Jul 6, 2026
+              Updated Jul 7, 2026
             </div>
             <div class="period" id="ob-period"></div>
             <div class="print-context" id="ob-print-ctx"></div>
@@ -627,7 +627,7 @@ body {
             <button class="modal-close" onclick="document.getElementById('ob-modal').classList.remove('open')">✕</button>
           </div>
           <div class="modal-body">
-            <div class="modal-block"><h4>What is a sequence?</h4><p>A sequence is a curated list of ICP-aligned contacts enrolled in a structured 10-week outreach cadence. Each sequence is purpose-built for a specific seller's target accounts or an independent hunting motion like Procurement or Lost Opps.</p></div>
+            <div class="modal-block"><h4>What is a sequence?</h4><p>A sequence is a curated list of ICP-aligned contacts enrolled in a structured 10-week outreach cadence. Each sequence is purpose-built for a specific seller's target accounts or independent procurement motions like Procurement Desk, Lost Opps.</p></div>
             <hr class="modal-divider">
             <div class="modal-block"><h4>What each sequence contains</h4><p>Every week, for each contact in the sequence, the BDR executes three touches:</p><div class="modal-pills"><span class="modal-pill" style="background:#D6EEFF;color:#007DFF">1 personalized email</span><span class="modal-pill" style="background:#E0FAF5;color:#004D3D">1 LinkedIn touchpoint</span><span class="modal-pill" style="background:#FDEADF;color:#D94806">1 outbound call</span></div><p style="margin-top:10px">That's 10 emails, 10 LinkedIn touchpoints, and 10 calls per contact over the course of the sequence.</p></div>
             <hr class="modal-divider">
@@ -650,12 +650,12 @@ body {
     <div class="sh-foot-item" data-r="ib">
       <span class="sh-foot-dot"></span>
       <span class="sh-foot-label">Inbound</span>
-      <span>Updated Jul 6, 2026</span>
+      <span>Updated Jul 7, 2026</span>
     </div>
     <div class="sh-foot-item" data-r="ob">
       <span class="sh-foot-dot"></span>
       <span class="sh-foot-label">Outbound</span>
-      <span>Updated Jul 6, 2026</span>
+      <span>Updated Jul 7, 2026</span>
     </div>
   </div>
   <div class="sh-foot-copy">Pre-Sales Team · TTEC</div>
@@ -894,14 +894,14 @@ function shSwitch(tab) {
     document.getElementById('ob-outbound-section').innerHTML=(activeType==='all'||activeType==='Outbound')&&ob.length
       ?`<div class="section outbound-section"><div class="section-head"><h2>Outbound Sequences</h2><span class="section-count">${ob.length} sequence${ob.length!==1?'s':''}</span></div><p class="note">Seller-aligned sequences targeting ICP accounts.</p><div class="seq-grid${ob.length===1?' single':''}">${ob.map(seqCard).join('')}</div></div>`:'';
     document.getElementById('ob-hunting-section').innerHTML=(activeType==='all'||activeType==='Hunting')&&hu.length
-      ?`<div class="section hunting-section"><div class="section-head"><h2>Hunting Sequences</h2><span class="section-count">${hu.length} sequence${hu.length!==1?'s':''}</span></div><p class="note">Independent motions — Procurement Desk, Lost Opps, Zombie Leads, Digital cross-sell.</p><div class="seq-grid${hu.length===1?' single':''}">${hu.map(seqCard).join('')}</div></div>`:'';
+      ?`<div class="section hunting-section"><div class="section-head"><h2>Procurement Sequences</h2><span class="section-count">${hu.length} sequence${hu.length!==1?'s':''}</span></div><p class="note">Procurement-led motions — Procurement Desk, Lost Opps, Zombie Leads, Digital cross-sell.</p><div class="seq-grid${hu.length===1?' single':''}">${hu.map(seqCard).join('')}</div></div>`:'';
   }
 
   function renderTable(rows) {
     document.getElementById('ob-sum-thead').innerHTML='<tr><th>Sequence</th><th>BDR</th><th>Type</th><th>Status</th><th>Progress</th><th style="text-align:right">Contacts</th><th style="text-align:right">Active</th><th style="text-align:right">Replies</th><th style="text-align:right">Reply %</th><th style="text-align:right">Meetings</th></tr>';
     document.getElementById('ob-sum-tbody').innerHTML=rows.map(s=>{
       var p=pct(s.currentWeek,10),rr=pct(s.emailsReplies,s.emailsDelivered),isH=s.type==='Hunting';
-      return `<tr><td class="seq-col">${esc(s.name)}</td><td class="bdr-col">${esc(s.bdr)}</td><td><span class="badge badge-${s.type.toLowerCase()}">${esc(s.type)}</span></td><td>${statusBadge(s.status)}</td><td><div class="prog-inline"><div class="bar"><i class="${isH?'h':''}" style="width:${p}%"></i></div><span class="pct">${p}%</span></div></td><td class="num-cell">${s.totalContacts}</td><td class="num-cell">${s.prospectsActive}</td><td class="num-cell">${s.emailsReplies}</td><td class="num-cell">${s.emailsDelivered?rr+'%':'—'}</td><td class="meet-cell">${s.meetingsBooked}</td></tr>`;
+      return `<tr><td class="seq-col">${esc(s.name)}</td><td class="bdr-col">${esc(s.bdr)}</td><td><span class="badge badge-${s.type.toLowerCase()}">${s.type==='Hunting'?'Procurement':esc(s.type)}</span></td><td>${statusBadge(s.status)}</td><td><div class="prog-inline"><div class="bar"><i class="${isH?'h':''}" style="width:${p}%"></i></div><span class="pct">${p}%</span></div></td><td class="num-cell">${s.totalContacts}</td><td class="num-cell">${s.prospectsActive}</td><td class="num-cell">${s.emailsReplies}</td><td class="num-cell">${s.emailsDelivered?rr+'%':'—'}</td><td class="meet-cell">${s.meetingsBooked}</td></tr>`;
     }).join('')||'<tr><td colspan="10" style="color:var(--muted);padding:14px 10px">No sequences match this filter.</td></tr>';
   }
 
@@ -951,7 +951,7 @@ function shSwitch(tab) {
       cont.appendChild(b);
     }
     mk(bC,'All BDRs','all','bdr'); BDRS.forEach(b=>mk(bC,b,b,'bdr'));
-    mk(tC,'All','all','type'); TYPES.forEach(t=>mk(tC,t,t,'type'));
+    mk(tC,'All','all','type'); TYPES.forEach(t=>mk(tC,t==='Hunting'?'Procurement':t,t,'type'));
   }
 
   buildFilters();

@@ -306,7 +306,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 }
 
 .vt-child{
-  position:relative; padding:0 8px;
+  position:relative; padding:0 12px;
   display:flex; flex-direction:column; align-items:center;
 }
 
@@ -348,7 +348,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 .vt-col{
   display:grid;
   grid-template-columns:repeat(var(--col-count, 1), auto);
-  gap:8px 12px;
+  gap:8px 16px;
   justify-items:center;
   padding:10px 14px;
   background:color-mix(in srgb, var(--blue) 6%, white);
@@ -474,11 +474,12 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 </main>
 
 <script>
-const LOCATION_ORDER = ["Colombia","United States","Canada","United Kingdom","Philippines","Egypt","India"];
+const LOCATION_ORDER = ["Colombia","United States","Canada","Ireland","United Kingdom","Philippines","Egypt","India"];
 const FLAG_SVG = {
   CO: '<svg viewBox="0 0 24 16"><rect width="24" height="16" fill="#FCD116"/><rect y="8" width="24" height="4" fill="#003893"/><rect y="12" width="24" height="4" fill="#CE1126"/></svg>',
   US: '<svg viewBox="0 0 24 16"><rect width="24" height="16" fill="#B22234"/><rect y="1.23" width="24" height="1.23" fill="#fff"/><rect y="3.69" width="24" height="1.23" fill="#fff"/><rect y="6.15" width="24" height="1.23" fill="#fff"/><rect y="8.62" width="24" height="1.23" fill="#fff"/><rect y="11.08" width="24" height="1.23" fill="#fff"/><rect y="13.54" width="24" height="1.23" fill="#fff"/><rect width="10" height="8.6" fill="#3C3B6E"/></svg>',
   CA: '<svg viewBox="0 0 24 16"><rect width="24" height="16" fill="#FF0000"/><rect x="6" width="12" height="16" fill="#fff"/><polygon points="12,4 13,7 16,7 13.5,9 14.5,12 12,10 9.5,12 10.5,9 8,7 11,7" fill="#FF0000"/></svg>',
+  IE: '<svg viewBox="0 0 24 16"><rect width="8" height="16" fill="#169B62"/><rect x="8" width="8" height="16" fill="#fff"/><rect x="16" width="8" height="16" fill="#FF883E"/></svg>',
   GB: '<svg viewBox="0 0 24 16"><rect width="24" height="16" fill="#012169"/><polygon points="0,0 24,16 24,13 4,0" fill="#fff"/><polygon points="24,0 0,16 0,13 20,0" fill="#fff"/><polygon points="0,0 24,16 24,14.5 2,0" fill="#C8102E"/><polygon points="24,0 0,16 0,14.5 22,0" fill="#C8102E"/><rect x="10" width="4" height="16" fill="#fff"/><rect y="6" width="24" height="4" fill="#fff"/><rect x="10.7" width="2.6" height="16" fill="#C8102E"/><rect y="6.7" width="24" height="2.6" fill="#C8102E"/></svg>',
   PH: '<svg viewBox="0 0 24 16"><rect width="24" height="8" fill="#0038A8"/><rect y="8" width="24" height="8" fill="#CE1126"/><polygon points="0,0 10,8 0,16" fill="#fff"/><circle cx="4" cy="8" r="2" fill="#FCD116"/></svg>',
   EG: '<svg viewBox="0 0 24 16"><rect width="24" height="16" fill="#fff"/><rect width="24" height="5.33" fill="#CE1126"/><rect y="10.67" width="24" height="5.33" fill="#000"/></svg>',
@@ -490,6 +491,7 @@ const FLAGS = {
   "United States & Canada": flagIcon("US"),
   "United States": flagIcon("US"),
   "Canada": flagIcon("CA"),
+  "Ireland": flagIcon("IE"),
   "United Kingdom": flagIcon("GB"),
   "Philippines": flagIcon("PH"),
   "Egypt": flagIcon("EG"),
@@ -508,8 +510,8 @@ const RAW_DEPARTMENTS = [
       {n:"Natalia Acosta", t:"Growth Marketing Manager", loc:"Colombia"},
       {n:"Sarah Leigh Roddis", t:"Consultant, Marketing Brand and Content", loc:"United Kingdom"}
   ]},
-  {name:"Linda Mullen", role:"EMEA", location:"United Kingdom", members:[
-      {n:"Carlos Frige", t:"Marketing Campaign Lead", loc:"United Kingdom"}
+  {name:"Linda Mullen", role:"EMEA", location:"Ireland", members:[
+      {n:"Carlos Frige", t:"Marketing Campaign Lead", loc:"Ireland"}
   ]},
   {name:"Nicole Maus", role:"Partner Growth", location:"United States", members:[
       {n:"Ashley Fischer", t:"Partner Marketing Manager, Google & Cisco", loc:"United States"},
@@ -551,7 +553,7 @@ const RAW_DEPARTMENTS = [
       {n:"Beth Ingebretson", t:"Communications Leader", loc:"United States"},
       {n:"Carolyn Turney", t:"Senior Content Strategist", loc:"United States"},
       {n:"Ellen Kane", t:"Senior Content Strategist", loc:"United States"},
-      {n:"Erica DeFoort", t:"Marketing Program Manager, Client", loc:"United States"}
+      {n:"Erica DeFoort", t:"Marketing Program Manager, Client", loc:"Canada"}
   ]},
   {name:"Nicolas Agudelo", role:"Creative", location:"Colombia", members:[
       {n:"Alejandra Gaitan", t:"Senior Graphic Designer", loc:"Colombia"},

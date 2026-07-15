@@ -306,7 +306,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 }
 
 .vt-child{
-  position:relative; padding:0 12px;
+  position:relative; padding:0 18px;
   display:flex; flex-direction:column; align-items:center;
 }
 
@@ -748,10 +748,11 @@ function hasSubTree(m){
   return getChildren(m).length > 0;
 }
 
-function buildVtCol(members, label){
+function buildVtCol(members, label, maxCols){
   const col = document.createElement('div');
   col.className = 'vt-col';
-  const cols = members.length >= 4 ? Math.ceil(Math.sqrt(members.length)) : 1;
+  let cols = members.length >= 4 ? Math.ceil(Math.sqrt(members.length)) : 1;
+  if(maxCols) cols = Math.min(cols, maxCols);
   col.style.setProperty('--col-count', cols);
   const sorted = [...members].sort((a,b) => norm(a.n || a.label || '').localeCompare(norm(b.n || b.label || '')));
   sorted.forEach(m => col.appendChild(buildHtCard(m, false)));
@@ -804,11 +805,12 @@ function renderVtNode(m, container, isRoot){
       kids.appendChild(wrap);
     });
 
-    // Leaves: stack in one unlabeled column
+    // Leaves: compact grid (cap at 2 cols if sharing with branches)
     if(leaves.length > 0){
       const wrap = document.createElement('div');
       wrap.className = 'vt-child';
-      wrap.appendChild(buildVtCol(leaves, null));
+      const hasSiblings = branches.length > 0 || subteams.length > 0;
+      wrap.appendChild(buildVtCol(leaves, null, hasSiblings ? 2 : undefined));
       kids.appendChild(wrap);
     }
 

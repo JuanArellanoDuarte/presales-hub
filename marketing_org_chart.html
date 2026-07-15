@@ -438,7 +438,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 <main>
 
   <div class="leadership">
-    <div class="lead-card boss"><div class="name-row"><span id="marjiFlag"></span><div class="name">Marji Chimes</div></div><div class="role">Chief Marketing Officer</div><div class="total-pill" id="marjiTotal"></div></div>
+    <div class="lead-card boss"><div class="name-row"><span id="marjiFlag"></span><div class="name">Marji Chimes</div></div><div class="role">Group Vice President</div><div class="total-pill" id="marjiTotal"></div></div>
     <div class="lead-card"><div class="name-row"><span id="johnFlag"></span><div class="name">John Seeds</div></div><div class="role">Strategic Advisor</div></div>
   </div>
   <div class="trunk"></div>
@@ -497,81 +497,103 @@ const FLAGS = {
 };
 const TBH_ICON = '<span class="flag-icon" style="box-shadow:none;"><svg viewBox="0 0 24 16"><rect x="1.2" y="1.2" width="21.6" height="13.6" rx="2" fill="none" stroke="#9C93BE" stroke-width="1.6" stroke-dasharray="2.6 2.2"/></svg></span>';
 
-const TITLE_POOL = ["Marketing Specialist","Coordinator","Senior Associate","Program Manager","Marketing Analyst","Associate Manager","Content Strategist","Campaign Manager","Consultant","Team Lead"];
-let titleCursor = 0;
-function dummyTitle(){ return TITLE_POOL[titleCursor++ % TITLE_POOL.length]; }
-
 const RAW_DEPARTMENTS = [
-  { name:"Hernan Repetto", role:"Portfolio Growth", location:"United Kingdom", members:[
-    {n:"Natalia Acosta", loc:"Colombia"}, {n:"Maria Jimenez", loc:"Colombia"}, {n:"Miguel Faudel", loc:"Colombia"},
-    {n:"Juan Caicedo", loc:"Colombia"}, {n:"Daniela Alfaro", loc:"Colombia"}, {n:"Sarah Leigh Roddis", loc:"United Kingdom"},
-    {n:"Ayman Ali", loc:"Egypt"}, {n:"Jr. Growth Marketer", tbh:true},
+  {name:"Hernan Repetto", role:"Portfolio Growth", location:"United Kingdom", members:[
+      {n:"Ayman Ali", t:"Lead Specialist", loc:"Egypt"},
+      {n:"Daniela Alfaro", t:"Growth Marketing Manager", loc:"Colombia"},
+      {n:"Jr. Growth Marketer", t:"", loc:"", tbh:true},
+      {n:"Juan Caicedo", t:"Growth Marketing Manager", loc:"Colombia"},
+      {n:"Maria Jimenez", t:"Growth Marketing Manager", loc:"Colombia"},
+      {n:"Miguel Faudel", t:"Growth Marketing Manager", loc:"Colombia"},
+      {n:"Natalia Acosta", t:"Growth Marketing Manager", loc:"Colombia"},
+      {n:"Sarah Leigh Roddis", t:"Consultant, Marketing Brand and Content", loc:"United Kingdom"}
   ]},
-  { name:"Linda Mullen", role:"EMEA", location:"United Kingdom", members:[
-    {n:"Carlos Frige", loc:"United Kingdom"},
+  {name:"Linda Mullen", role:"EMEA", location:"United Kingdom", members:[
+      {n:"Carlos Frige", t:"Marketing Campaign Lead", loc:"United Kingdom"}
   ]},
-  { name:"Nicole Maus", role:"Partner Growth", location:"United States & Canada", members:[
-    {n:"Emily Best", loc:"United States & Canada"}, {n:"Jordan Quinn", loc:"United States & Canada"},
-    {n:"Marshall Salisbury", loc:"United States & Canada"}, {n:"Hannah Story", loc:"United States & Canada"},
-    {n:"Ashley Fischer", loc:"United States & Canada"}, {n:"Kathy Sheldrake", loc:"United States & Canada"},
-    {n:"Felipe Martinez", loc:"Colombia"},
+  {name:"Nicole Maus", role:"Partner Growth", location:"United States", members:[
+      {n:"Ashley Fischer", t:"Partner Marketing Manager, Google & Cisco", loc:"United States"},
+      {n:"Emily Best", t:"Partner Marketing Manager, AWS", loc:"United States"},
+      {n:"Felipe Martinez", t:"Lead Events Specialist", loc:"Colombia"},
+      {n:"Hannah Story", t:"Partner Marketing Manager, Microsoft", loc:"United States"},
+      {n:"Jordan Quinn", t:"Partner Marketing Manager, CCaaS", loc:"United States"},
+      {n:"Kathy Sheldrake", t:"Senior Manager, Event Experience & Operations", loc:"United States"},
+      {n:"Marshall Salisbury", t:"Senior Industry Marketing Manager", loc:"United States"}
   ]},
-  { name:"Charlie Schrier", role:"Demand Gen & Product", location:"United States", members:[
-    {n:"Keara Klose", loc:"United States"}, {n:"Jamie Pitts", loc:"United States"},
-    {n:"Nick Daniels", loc:"United States"}, {n:"Rebeca Peña", loc:"Colombia"},
-    {n:"Colin Sheehan", loc:"United States"}, {n:"Horizontal Product", tbh:true},
-    {n:"Juan Arellano", loc:"Colombia", t:"Demand Generation Senior Manager", sub:{ label:"Pre-Sales Team", members:[
-      {n:"Melissa Castiblanco", loc:"Colombia", t:"Lead Development Representative"}, {n:"Carolina Giraldo", loc:"Colombia", t:"Procurement Specialist"}, {n:"Kyle Hartman", loc:"Colombia", t:"Pre-Sales Supervisor"},
-      {subteam:true, label:"BizDev", members:[
-        {n:"Hugo Camacho", loc:"Colombia", t:"Business Development Representative"}, {n:"Alfredo Nava", loc:"Colombia", t:"Business Development Representative"},
-        {n:"Ramiro Peña", loc:"Colombia", t:"Business Development Representative"}, {n:"Monica Baron", loc:"Colombia", t:"Business Development Representative"},
-      ]},
-    ]}},
+  {name:"Charlie Schrier", role:"Demand Generation & Product", location:"United States", members:[
+      {n:"Horizontal Product", t:"", loc:"", tbh:true},
+      {n:"Jamie Pitts", t:"Demand Generation Senior Manager", loc:"United States"},
+      {n:"Juan Arellano", t:"Demand Generation Senior Manager", loc:"Colombia", sub:{label:"Pre-Sales Team", members:[
+          {n:"Carolina Giraldo", t:"Procurement Specialist", loc:"Colombia"},
+          {n:"Kyle Hartman", t:"Pre-Sales Supervisor", loc:"Colombia"},
+          {n:"Melissa Castiblanco", t:"Lead Development Representative", loc:"Colombia"},
+          {subteam:true, label:"Business Development", members:[
+            {n:"Alfredo Nava", t:"Business Development Representative", loc:"Colombia"},
+            {n:"Hugo Camacho", t:"Business Development Representative", loc:"Colombia"},
+            {n:"Monica Baron", t:"Business Development Representative", loc:"Colombia"},
+            {n:"Ramiro Peña", t:"Business Development Representative", loc:"Colombia"}
+          ]}
+      ]}},
+      {n:"Keara Klose", t:"Social Media Manager", loc:"United States"},
+      {n:"Nick Daniels", t:"Demand Generation Manager", loc:"United States"},
+      {n:"Rebeca Peña", t:"Product Marketing Manager", loc:"Colombia"}
   ]},
-  { name:"Martha Gomez", role:"GTM Management", location:"Colombia", members:[
-    {n:"Maria Salgado", loc:"Colombia"}, {n:"Brooke Murphy", loc:"Colombia"}, {n:"Madhuvarsh Konduri", loc:"India"},
-    {n:"Fabian Munoz", loc:"Colombia"}, {n:"Penny Ybañez", loc:"Philippines"}, {n:"Natalia Sogamoso", loc:"Colombia"},
+  {name:"Martha Gomez", role:"Go To Market Management", location:"Colombia", members:[
+      {n:"Brooke Murphy", t:"Global Marketing Project Manager", loc:"Colombia"},
+      {n:"Colin Sheehan", t:"Marketing Operations Specialist", loc:"United States"},
+      {n:"Fabian Munoz", t:"Marketing Project Manager", loc:"Colombia"},
+      {n:"Madhuvarsh Konduri", t:"Marketing Coordinator", loc:"India"},
+      {n:"Maria Salgado", t:"Administrative Assistant", loc:"Colombia"},
+      {n:"Natalia Sogamoso", t:"Marketing Project Manager", loc:"Colombia"},
+      {n:"Penny Ybañez", t:"Marketing Project Manager", loc:"Philippines"}
   ]},
-  { name:"Kristin Walters", role:"Brand, Client, CX", location:"United States & Canada", members:[
-    {n:"Erica DeFoort", loc:"United States & Canada"}, {n:"Carolyn Turney", loc:"United States & Canada"},
-    {n:"Ellen Kane", loc:"United States & Canada"}, {n:"Beth Ingebretson", loc:"United States & Canada"},
+  {name:"Kristin Walters", role:"Brand, Client, CX", location:"United States", members:[
+      {n:"Beth Ingebretson", t:"Communications Leader", loc:"United States"},
+      {n:"Carolyn Turney", t:"Senior Content Strategist", loc:"United States"},
+      {n:"Ellen Kane", t:"Senior Content Strategist", loc:"United States"},
+      {n:"Erica DeFoort", t:"Marketing Program Manager, Client", loc:"United States"}
   ]},
-  { name:"Nicolas Agudelo", role:"Creative", location:"Colombia", members:[
-    {n:"Rafael Nieves", loc:"Colombia"}, {n:"Daniel Castro", loc:"Colombia"}, {n:"UX Designer", tbh:true},
-    {n:"Jared Jenkins", loc:"United States & Canada"}, {n:"Sebastian Sarmiento", loc:"Colombia"},
-    {n:"Freddy Arias", loc:"Colombia"}, {n:"Angelo Panopio", loc:"Philippines"}, {n:"Jayson Bagtas", loc:"Philippines"},
-    {n:"Beth Bagtas", loc:"Philippines"}, {n:"Greta Schliesman", loc:"United States & Canada"},
+  {name:"Nicolas Agudelo", role:"Creative", location:"Colombia", members:[
+      {n:"Alejandra Gaitan", t:"Senior Graphic Designer", loc:"Colombia"},
+      {n:"Angelo Panopio", t:"Employee Communications", loc:"Philippines"},
+      {n:"Beth Bagtas", t:"Creative Services Consultant", loc:"Philippines"},
+      {n:"Chester Blanco", t:"Senior Graphic Designer", loc:"Philippines"},
+      {n:"Constantine Gulmatico", t:"Creative Services Consultant", loc:"Philippines"},
+      {n:"Daniel Castro", t:"Graphic Designer", loc:"Colombia"},
+      {n:"Elliot Villalba", t:"Senior Graphic Designer", loc:"Colombia"},
+      {n:"Freddy Arias", t:"Motion Graphic Designer & Video Editor", loc:"Colombia"},
+      {n:"Greta Schliesman", t:"Video & Graphic Design", loc:"United States"},
+      {n:"Idda Baello", t:"Graphic Designer", loc:"Philippines"},
+      {n:"Jared Jenkins", t:"Global Director of Video Marketing", loc:"United States"},
+      {n:"Jayson Bagtas", t:"Creative Services Consultant", loc:"Philippines"},
+      {n:"Jeffrey Bayonito", t:"Senior Graphic Designer", loc:"Philippines"},
+      {n:"Juan Escobar", t:"Senior Copywriter", loc:"Colombia"},
+      {n:"Microsoft Designer", t:"", loc:"", tbh:true},
+      {n:"Miel K. Mabutas", t:"Creative Services Manager", loc:"Philippines"},
+      {n:"Rachelle Recomono", t:"Senior Graphic Web Designer", loc:"Philippines"},
+      {n:"Rafael Nieves", t:"Senior Bilingual Copywriter", loc:"Colombia"},
+      {n:"Sebastian Sarmiento", t:"Creative Producer", loc:"Colombia"},
+      {n:"Terra Gullet Brown", t:"Global Art Director", loc:"United States"},
+      {n:"UX Designer", t:"", loc:"", tbh:true}
   ]},
-  { name:"Jeff Goeke", role:"Exec Projects", location:"United States & Canada", members:[
-    {n:"Juan Escobar", loc:"Colombia"}, {n:"Elliot Villalba", loc:"Colombia"}, {n:"Alejandra Gaitan", loc:"Colombia"},
-    {n:"Microsoft Designer", tbh:true}, {n:"Terra Gullet Brown", loc:"United States & Canada"},
-    {n:"Idda Baello", loc:"Philippines"}, {n:"Miel K. Mabutas", loc:"Philippines"}, {n:"Rachelle Recomono", loc:"Philippines"},
-    {n:"Constantine Gulmatico", loc:"Philippines"}, {n:"Jeffrey Bayonito", loc:"Philippines"}, {n:"Chester Blanco", loc:"Philippines"},
+  {name:"Jeff Goeke", role:"Executive Projects", location:"United States", members:[]},
+  {name:"Meredith Matthews", role:"Public Relations", location:"United States", members:[]},
+  {name:"Miles White", role:"Digital Marketing", location:"United States", members:[
+      {n:"Amir Andrawes", t:"Social Media Lead", loc:"Egypt"},
+      {n:"Andres Romero", t:"Marketing Automation Specialist", loc:"Colombia"},
+      {n:"Angelica Bazurto", t:"Marketing Ops & Digital Experience Senior Manager", loc:"Colombia"},
+      {n:"Donn Santiago", t:"Lead Specialist", loc:"Philippines"},
+      {n:"K Sunandha", t:"Specialist, Multimedia", loc:"India"},
+      {n:"Lina Vargas", t:"Digital Marketing Manager", loc:"Colombia"},
+      {n:"Mark Musante", t:"Senior Consultant, Multimedia", loc:"United States"},
+      {n:"Radwa Khalifa", t:"Lead Marketing Operations Specialist", loc:"Egypt"},
+      {n:"Ricardo Vilanova", t:"Senior Specialist, Social Media Marketing", loc:"Colombia"}
   ]},
-  { name:"Meredith Matthews", role:"PR", location:"United States & Canada", members:[]},
-  { name:"Miles White", role:"Digital Marketing", location:"United States & Canada", members:[
-    {n:"Lina Vargas", loc:"Colombia"}, {n:"Donn Santiago", loc:"Philippines"}, {n:"Mark Musante", loc:"United States & Canada"},
-    {n:"K Sunandha", loc:"India"}, {n:"Angelica Bazurto", loc:"Colombia"}, {n:"Andres Romero", loc:"Colombia"},
-    {n:"Ricardo Vilanova", loc:"Colombia"}, {n:"Radwa Khalifa", loc:"Egypt"}, {n:"Amir Andrawes", loc:"Egypt"},
-  ]},
-  { name:"Elizabeth Glagowski", role:"Editorial", location:"United States & Canada", members:[
-    {n:"Cara Rosner", loc:"United States & Canada"}, {n:"Denise Power", loc:"United States & Canada"},
+  {name:"Elizabeth Glagowski", role:"Editorial", location:"United States", members:[
+      {n:"Cara Rosner", t:"Managing Editor", loc:"United States"}
   ]},
 ];
-
-// Assign placeholder titles once, in reading order, so the design can be reviewed with realistic text lengths.
-function assignTitles(members){
-  members.forEach(m => {
-    if(m.subteam){ assignTitles(m.members); return; }
-    if(m.tbh){ m.t = "Open requisition"; }
-    else if(!m.t){ m.t = dummyTitle(); }   // keep real titles; only fill placeholders where none set
-    if(m.sub) assignTitles(m.sub.members);
-  });
-}
-RAW_DEPARTMENTS.forEach(d => assignTitles(d.members));
-
-// Teams are ordered alphabetically by team name, not by leader name or original list order.
-RAW_DEPARTMENTS.sort((a,b) => a.role.toLowerCase().localeCompare(b.role.toLowerCase()));
+RAW_DEPARTMENTS.sort((a,b) => a.role.localeCompare(b.role));
 
 function norm(s){ return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
 function countReal(members){
@@ -855,7 +877,7 @@ function renderDrill(dept){
   marji.className = 'drill-marji';
   const marjiCard = document.createElement('div');
   marjiCard.className = 'ht-card ht-cmo';
-  marjiCard.innerHTML = `${FLAGS["United States & Canada"]}<div class="ht-card-info"><div class="ht-name">Marji Chimes</div><div class="ht-title">Chief Marketing Officer</div></div>`;
+  marjiCard.innerHTML = `${FLAGS["United States & Canada"]}<div class="ht-card-info"><div class="ht-name">Marji Chimes</div><div class="ht-title">Group Vice President</div></div>`;
   marji.appendChild(marjiCard);
   const drop = document.createElement('div');
   drop.className = 'drill-drop';

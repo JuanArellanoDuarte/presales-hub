@@ -638,7 +638,7 @@ function countReal(members){
 }
 function sortLabel(x){ return x.subteam ? x.label : x.n; }
 
-const totalPeople = RAW_DEPARTMENTS.length + RAW_DEPARTMENTS.reduce((sum,d) => sum + countReal(d.members), 0);
+const totalPeople = 1 + RAW_DEPARTMENTS.length + RAW_DEPARTMENTS.reduce((sum,d) => sum + countReal(d.members), 0); // +1 for Marji
 document.getElementById('marjiTotal').textContent = `${totalPeople} people across ${RAW_DEPARTMENTS.length} teams`;
 document.getElementById('marjiFlag').innerHTML = FLAGS["United States & Canada"];
 document.getElementById('johnFlag').innerHTML = FLAGS["United States & Canada"];

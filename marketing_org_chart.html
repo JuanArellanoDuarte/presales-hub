@@ -267,6 +267,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
   background:color-mix(in srgb, var(--orange) 6%, white);
   border-color:color-mix(in srgb, var(--orange) 25%, white);
   padding:6px 12px 5px;
+  margin-bottom:14px;
 }
 .ht-card.ht-group .ht-name{ font-size:11px; font-weight:800; color:var(--orange); letter-spacing:.04em; text-transform:uppercase; }
 
@@ -276,6 +277,14 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
   box-shadow:0 2px 8px rgba(217,72,6,.1);
 }
 .ht-card.ht-active .ht-name{ color:var(--navy); }
+
+/* Shared member badge — small pill showing secondary team */
+.ht-shared-badge{
+  display:inline-block; font-size:9.5px; font-weight:500;
+  color:#534AB7; background:#EEEDFE;
+  border:0.5px solid #AFA9EC;
+  border-radius:8px; padding:1px 8px; margin-top:2px;
+}
 
 /* Marji CMO card */
 .ht-card.ht-cmo{
@@ -295,13 +304,13 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 
 .vt-kids{
   display:inline-flex; position:relative;
-  padding-top:26px;
+  padding-top:30px;
 }
 
 /* Vertical drop from parent card to rail level */
 .vt-kids::before{
   content:''; position:absolute;
-  left:50%; top:0; height:13px; width:0;
+  left:50%; top:0; height:15px; width:0;
   border-left:1.5px solid #D0CCC4;
 }
 
@@ -313,14 +322,14 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 /* Horizontal rail segment spanning each child's width */
 .vt-child::after{
   content:''; position:absolute;
-  top:-13px; left:0; right:0; height:0;
+  top:-15px; left:0; right:0; height:0;
   border-top:1.5px solid #D0CCC4;
 }
 
 /* Vertical tap from rail down to child card */
 .vt-child::before{
   content:''; position:absolute;
-  left:50%; top:-13px; height:13px; width:0;
+  left:50%; top:-15px; height:15px; width:0;
   border-left:1.5px solid #D0CCC4;
 }
 
@@ -330,7 +339,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 .vt-child:last-child::after{ right:50%; }
 /* Only child: no rail, just extend the drop */
 .vt-child:only-child::after{ display:none; }
-.vt-child:only-child::before{ height:13px; }
+.vt-child:only-child::before{ height:15px; }
 
 .vt-node > .ht-card{ margin-bottom:0; }
 .vt-child > .vt-node > .ht-card{ white-space:nowrap; }
@@ -427,7 +436,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
   </div>
   <div class="sh-title">
     <h1>Marketing Org Chart</h1>
-    <span class="sh-updated">Updated July 7, 2026</span>
+    <span class="sh-updated">Updated July 17, 2026</span>
   </div>
   <div class="sh-actions">
     <button class="overview-back" id="overviewBack" onclick="exitDrill()">Overview</button>
@@ -474,7 +483,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 </main>
 
 <script>
-const LOCATION_ORDER = ["Colombia","United States","Canada","Ireland","United Kingdom","Philippines","Egypt","India"];
+const LOCATION_ORDER = ["Canada","Colombia","Egypt","India","Ireland","Philippines","United Kingdom","United States"];
 const FLAG_SVG = {
   CO: '<svg viewBox="0 0 24 16"><rect width="24" height="16" fill="#FCD116"/><rect y="8" width="24" height="4" fill="#003893"/><rect y="12" width="24" height="4" fill="#CE1126"/></svg>',
   US: '<svg viewBox="0 0 24 16"><rect width="24" height="16" fill="#B22234"/><rect y="1.23" width="24" height="1.23" fill="#fff"/><rect y="3.69" width="24" height="1.23" fill="#fff"/><rect y="6.15" width="24" height="1.23" fill="#fff"/><rect y="8.62" width="24" height="1.23" fill="#fff"/><rect y="11.08" width="24" height="1.23" fill="#fff"/><rect y="13.54" width="24" height="1.23" fill="#fff"/><rect width="10" height="8.6" fill="#3C3B6E"/></svg>',
@@ -501,26 +510,31 @@ const TBH_ICON = '<span class="flag-icon" style="box-shadow:none;"><svg viewBox=
 
 const RAW_DEPARTMENTS = [
   {name:"Hernan Repetto", role:"Portfolio Growth", location:"United Kingdom", members:[
-      {n:"Ayman Ali", t:"Lead Specialist", loc:"Egypt"},
       {n:"Daniela Alfaro", t:"Growth Marketing Manager", loc:"Colombia"},
       {n:"Jr. Growth Marketer", t:"", loc:"", tbh:true},
       {n:"Juan Caicedo", t:"Growth Marketing Manager", loc:"Colombia"},
       {n:"Maria Jimenez", t:"Growth Marketing Manager", loc:"Colombia"},
       {n:"Miguel Faudel", t:"Growth Marketing Manager", loc:"Colombia"},
       {n:"Natalia Acosta", t:"Growth Marketing Manager", loc:"Colombia"},
-      {n:"Sarah Leigh Roddis", t:"Consultant, Marketing Brand and Content", loc:"United Kingdom"}
+      {n:"Sarah Leigh Roddis", t:"Consultant, Marketing Brand and Content", loc:"United Kingdom", sub:{label:"", members:[
+        {n:"Ayman Ali", t:"Lead Specialist", loc:"Egypt"}
+      ]}}
   ]},
   {name:"Linda Mullen", role:"EMEA", location:"Ireland", members:[
-      {n:"Carlos Frige", t:"Marketing Campaign Lead", loc:"Ireland"}
+      {n:"Carlos Frige", t:"EMEA & ANZ Marketing & Campaign Lead", loc:"Ireland"}
   ]},
   {name:"Nicole Maus", role:"Partner Growth", location:"United States", members:[
-      {n:"Ashley Fischer", t:"Partner Marketing Manager, Google & Cisco", loc:"United States"},
-      {n:"Emily Best", t:"Partner Marketing Manager, AWS", loc:"United States"},
-      {n:"Felipe Martinez", t:"Lead Events Specialist", loc:"Colombia"},
-      {n:"Hannah Story", t:"Partner Marketing Manager, Microsoft", loc:"United States"},
-      {n:"Jordan Quinn", t:"Partner Marketing Manager, CCaaS", loc:"United States"},
-      {n:"Kathy Sheldrake", t:"Senior Manager, Event Experience & Operations", loc:"United States"},
-      {n:"Marshall Salisbury", t:"Senior Industry Marketing Manager", loc:"United States"}
+      {subteam:true, label:"Portfolio Marketing Managers", members:[
+        {n:"Ashley Fischer", t:"Partner Marketing Manager, Google & Cisco", loc:"United States"},
+        {n:"Emily Best", t:"Partner Marketing Manager, AWS", loc:"United States"},
+        {n:"Hannah Story", t:"Partner Marketing Manager, Microsoft", loc:"United States"},
+        {n:"Jordan Quinn", t:"Partner Marketing Manager, CCaaS", loc:"United States"},
+        {n:"Marshall Salisbury", t:"Senior Industry Marketing Manager", loc:"United States"}
+      ]},
+      {subteam:true, label:"Events", members:[
+        {n:"Felipe Martinez", t:"Lead Events Specialist", loc:"Colombia"},
+        {n:"Kathy Sheldrake", t:"Senior Manager, Event Experience & Operations", loc:"United States"}
+      ]}
   ]},
   {name:"Charlie Schrier", role:"Demand Generation & Product", location:"United States", members:[
       {n:"Horizontal Product", t:"", loc:"", tbh:true},
@@ -541,19 +555,30 @@ const RAW_DEPARTMENTS = [
       {n:"Rebeca Peña", t:"Product Marketing Manager", loc:"Colombia"}
   ]},
   {name:"Martha Gomez", role:"Go To Market Management", location:"Colombia", members:[
-      {n:"Brooke Murphy", t:"Global Marketing Project Manager", loc:"Colombia"},
-      {n:"Colin Sheehan", t:"Marketing Operations Specialist", loc:"United States"},
-      {n:"Fabian Munoz", t:"Marketing Project Manager", loc:"Colombia"},
-      {n:"Madhuvarsh Konduri", t:"Marketing Coordinator", loc:"India"},
-      {n:"Maria Salgado", t:"Administrative Assistant", loc:"Colombia"},
-      {n:"Natalia Sogamoso", t:"Marketing Project Manager", loc:"Colombia"},
-      {n:"Penny Ybañez", t:"Marketing Project Manager", loc:"Philippines"}
+      {subteam:true, label:"Business Operations", members:[
+        {n:"Colin Sheehan", t:"Senior Marketing Operations Specialist", loc:"United States"},
+        {n:"Maria Salgado", t:"Administrative Assistant", loc:"Colombia"}
+      ]},
+      {subteam:true, label:"Delivery Project Management", members:[
+        {n:"Brooke Murphy", t:"Global Marketing Project Manager", loc:"United States", sub:{label:"", members:[
+          {n:"Madhuvarsh Konduri", t:"Marketing Coordinator", loc:"India"}
+        ]}},
+        {n:"Fabian Munoz", t:"Marketing Project Manager", loc:"Colombia"},
+        {n:"Natalia Sogamoso", t:"Marketing Project Manager", loc:"Colombia"},
+        {n:"Penny Ybañez", t:"Marketing Project Manager", loc:"Philippines"}
+      ]}
   ]},
   {name:"Kristin Walters", role:"Brand, Client, CX", location:"United States", members:[
-      {n:"Beth Ingebretson", t:"Communications Leader", loc:"United States"},
-      {n:"Carolyn Turney", t:"Senior Content Strategist", loc:"United States"},
-      {n:"Ellen Kane", t:"Senior Content Strategist", loc:"United States"},
-      {n:"Erica DeFoort", t:"Marketing Program Manager, Client", loc:"Canada"}
+      {subteam:true, label:"Client Marketing", members:[
+        {n:"Erica DeFoort", t:"Client Marketing Manager", loc:"Canada"}
+      ]},
+      {subteam:true, label:"Content", members:[
+        {n:"Carolyn Turney", t:"Senior Content Strategist", loc:"United States"},
+        {n:"Ellen Kane", t:"Senior Content Strategist", loc:"United States"}
+      ]},
+      {subteam:true, label:"Internal Communications", members:[
+        {n:"Beth Ingebretson", t:"TTEC Digital Communications Lead", loc:"United States"}
+      ]}
   ]},
   {name:"Nicolas Agudelo", role:"Creative", location:"Colombia", members:[
       {n:"Alejandra Gaitan", t:"Senior Graphic Designer", loc:"Colombia"},
@@ -581,15 +606,22 @@ const RAW_DEPARTMENTS = [
   {name:"Jeff Goeke", role:"Executive Projects", location:"United States", members:[]},
   {name:"Meredith Matthews", role:"Public Relations", location:"United States", members:[]},
   {name:"Miles White", role:"Digital Marketing", location:"United States", members:[
-      {n:"Amir Andrawes", t:"Social Media Lead", loc:"Egypt"},
-      {n:"Andres Romero", t:"Marketing Automation Specialist", loc:"Colombia"},
-      {n:"Angelica Bazurto", t:"Marketing Ops & Digital Experience Senior Manager", loc:"Colombia"},
       {n:"Donn Santiago", t:"Lead Specialist", loc:"Philippines"},
-      {n:"K Sunandha", t:"Specialist, Multimedia", loc:"India"},
-      {n:"Lina Vargas", t:"Digital Marketing Manager", loc:"Colombia"},
-      {n:"Mark Musante", t:"Senior Consultant, Multimedia", loc:"United States"},
-      {n:"Radwa Khalifa", t:"Lead Marketing Operations Specialist", loc:"Egypt"},
-      {n:"Ricardo Vilanova", t:"Senior Specialist, Social Media Marketing", loc:"Colombia"}
+      {n:"Mark Musante", t:"Senior Consultant, Multimedia", loc:"United States", sub:{label:"Web Dev & CMS", members:[
+        {n:"K Sunandha", t:"Specialist, Multimedia", loc:"India"}
+      ]}},
+      {n:"Angelica Bazurto", t:"Marketing Ops & Digital Experience Sr Manager", loc:"Colombia", sub:{label:"Channel Marketing & Metrics", members:[
+        {subteam:true, label:"Email Marketing", members:[
+          {n:"Andres Romero", t:"Marketing Automation Specialist", loc:"Colombia"},
+          {n:"Radwa Khalifa", t:"Lead Marketing Operations Specialist", loc:"Egypt", shared:"Paid Media"}
+        ]},
+        {subteam:true, label:"Paid Media", members:[
+          {n:"Ricardo Vilanova", t:"Sr Specialist, Social Media Marketing", loc:"Colombia", shared:"Social Media"}
+        ]},
+        {subteam:true, label:"Social Media", members:[
+          {n:"Amir Andrawes", t:"Social Media Lead", loc:"Egypt"}
+        ]}
+      ]}}
   ]},
   {name:"Elizabeth Glagowski", role:"Editorial", location:"United States", members:[
       {n:"Cara Rosner", t:"Managing Editor", loc:"United States"}
@@ -732,7 +764,8 @@ function buildHtCard(m, isRoot){
     card.innerHTML = `<div class="ht-card-info"><div class="ht-name">${m.label}</div></div>`;
   } else {
     const flagHtml = m.tbh ? TBH_ICON : (FLAGS[m.loc] || '');
-    card.innerHTML = `${flagHtml}<div class="ht-card-info"><div class="ht-name">${m.n}</div><div class="ht-title">${m.t}</div></div>`;
+    const sharedBadge = m.shared ? `<span class="ht-shared-badge">+ ${m.shared}</span>` : '';
+    card.innerHTML = `${flagHtml}<div class="ht-card-info"><div class="ht-name">${m.n}</div><div class="ht-title">${m.t}</div>${sharedBadge}</div>`;
   }
   return card;
 }
@@ -761,8 +794,8 @@ function buildVtCol(members, label, maxCols){
     const wrap = document.createElement('div');
     wrap.className = 'vt-col-wrap';
     const lbl = document.createElement('div');
-    lbl.className = 'vt-col-label';
-    lbl.textContent = label;
+    lbl.className = 'ht-card ht-group';
+    lbl.innerHTML = `<div class="ht-card-info"><div class="ht-name">${label}</div></div>`;
     wrap.appendChild(lbl);
     wrap.appendChild(col);
     return wrap;
@@ -777,9 +810,9 @@ function renderVtNode(m, container, isRoot){
   // Sub-team label above the card
   if(m.sub && m.sub.label){
     const lbl = document.createElement('div');
-    lbl.className = 'vt-col-label';
-    lbl.style.padding = '0 0 3px';
-    lbl.textContent = m.sub.label;
+    lbl.className = 'ht-card ht-group';
+    lbl.style.marginBottom = '10px';
+    lbl.innerHTML = `<div class="ht-card-info"><div class="ht-name">${m.sub.label}</div></div>`;
     node.appendChild(lbl);
   }
 
@@ -815,22 +848,21 @@ function renderVtNode(m, container, isRoot){
     }
 
     // Subteam groups: each gets a labeled column
-    subteams.forEach(st => {
-      const wrap = document.createElement('div');
-      wrap.className = 'vt-child';
-      // Check if subteam members have their own sub-trees
-      const stBranches = st.members.filter(sm => hasSubTree(sm));
-      const stLeaves = st.members.filter(sm => !hasSubTree(sm));
+    if(subteams.length > 0){
+      subteams.forEach(st => {
+        const wrap = document.createElement('div');
+        wrap.className = 'vt-child';
+        const stBranches = st.members.filter(sm => hasSubTree(sm));
+        const stLeaves = st.members.filter(sm => !hasSubTree(sm));
 
-      if(stBranches.length === 0){
-        // All leaves: one labeled column
-        wrap.appendChild(buildVtCol(stLeaves, st.label));
-      } else {
-        // Mixed: render subteam as a tree node
-        renderVtNode(st, wrap, false);
-      }
-      kids.appendChild(wrap);
-    });
+        if(stBranches.length === 0){
+          wrap.appendChild(buildVtCol(stLeaves, st.label));
+        } else {
+          renderVtNode(st, wrap, false);
+        }
+        kids.appendChild(wrap);
+      });
+    }
 
     node.appendChild(kids);
   }

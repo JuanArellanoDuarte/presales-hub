@@ -41,7 +41,26 @@ body{
 .sh-updated{ font-size:11px; color:rgba(255,255,255,.4); font-weight:500; white-space:nowrap; }
 .sh-actions{ display:flex; align-items:center; gap:10px; margin-left:auto; flex-shrink:0; }
 
-.overview-back:focus-visible, .export-btn:focus-visible, .drill-nav-btn:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+.overview-back:focus-visible, .export-btn:focus-visible, .drill-nav-btn:focus-visible, .search input:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+
+.search{ position:relative; }
+.search input{
+  width:200px; max-width:32vw;
+  background:rgba(255,255,255,.1);
+  border:1.5px solid rgba(255,255,255,.18);
+  color:#fff; border-radius:10px;
+  padding:7px 12px 7px 32px;
+  font-size:13px; font-family:inherit; font-weight:500;
+  outline:none; transition:background .15s, border-color .15s;
+}
+.search input::placeholder{ color:rgba(255,255,255,.4); }
+.search input:focus{ background:rgba(255,255,255,.16); border-color:var(--blue); }
+.search svg{ position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:.5; pointer-events:none; color:#fff; }
+
+/* Search highlight states */
+.ov-item.search-dim{ opacity:.25; }
+.ov-person.search-match{ background:color-mix(in srgb, var(--teal) 15%, white); border-radius:4px; }
+.ht-card.search-match{ box-shadow:0 0 0 2px var(--teal); }
 
 .export-btn{
   font:inherit; font-size:12px; font-weight:700; color:#fff;
@@ -348,12 +367,6 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
 .vt-col-wrap{
   display:flex; flex-direction:column; align-items:center;
 }
-.vt-col-label{
-  font-size:10px; font-weight:800; color:var(--orange);
-  text-transform:uppercase; letter-spacing:.05em;
-  text-align:center;
-  padding-bottom:4px;
-}
 .vt-col{
   display:grid;
   grid-template-columns:repeat(var(--col-count, 1), auto);
@@ -420,6 +433,7 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
   .sh{ padding:10px 16px; height:auto; flex-wrap:wrap; row-gap:10px; }
   .sh-updated{ display:none; }
   .sh-actions{ margin-left:0; width:100%; justify-content:flex-end; flex-wrap:wrap; }
+  .search input{ max-width:100%; width:160px; }
   main{ padding:26px 16px 60px; }
 }
 </style>
@@ -436,9 +450,13 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
   </div>
   <div class="sh-title">
     <h1>Marketing Org Chart</h1>
-    <span class="sh-updated">Updated July 17, 2026</span>
+    <span class="sh-updated">Updated July 20, 2026</span>
   </div>
   <div class="sh-actions">
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="7.5"/><line x1="16" y1="16" x2="22" y2="22"/></svg>
+      <input type="text" id="searchInput" placeholder="Search name or title" autocomplete="off"/>
+    </div>
     <button class="overview-back" id="overviewBack" onclick="exitDrill()">Overview</button>
     <button class="export-btn" onclick="handleSaveAsPdf()">Save as PDF</button>
   </div>
@@ -600,7 +618,7 @@ const RAW_DEPARTMENTS = [
       {n:"Rachelle Recomono", t:"Senior Graphic Web Designer", loc:"Philippines"},
       {n:"Rafael Nieves", t:"Senior Bilingual Copywriter", loc:"Colombia"},
       {n:"Sebastian Sarmiento", t:"Creative Producer", loc:"Colombia"},
-      {n:"Terra Gullet Brown", t:"Global Art Director", loc:"United States"},
+      {n:"Terra Gullet Brown", t:"Global Art Director, Internal Communications and Talent Acquisition", loc:"United States"},
       {n:"UX Designer", t:"", loc:"", tbh:true}
   ]},
   {name:"Jeff Goeke", role:"Executive Projects", location:"United States", members:[]},
@@ -608,15 +626,15 @@ const RAW_DEPARTMENTS = [
   {name:"Miles White", role:"Digital Marketing", location:"United States", members:[
       {n:"Donn Santiago", t:"Lead Specialist", loc:"Philippines"},
       {n:"Mark Musante", t:"Senior Consultant, Multimedia", loc:"United States", sub:{label:"Web Dev & CMS", members:[
-        {n:"K Sunandha", t:"Specialist, Multimedia", loc:"India"}
+        {n:"Sunandha Kanala", t:"Specialist, Multimedia", loc:"India"}
       ]}},
-      {n:"Angelica Bazurto", t:"Marketing Ops & Digital Experience Sr Manager", loc:"Colombia", sub:{label:"Channel Marketing & Metrics", members:[
+      {n:"Angelica Bazurto", t:"Marketing Operations and Digital Experience Senior Manager", loc:"Colombia", sub:{label:"Channel Marketing & Metrics", members:[
         {subteam:true, label:"Email Marketing", members:[
-          {n:"Andres Romero", t:"Marketing Automation Specialist", loc:"Colombia"},
+          {n:"Andres Romero", t:"Marketing Automation Pardot Specialist", loc:"Colombia"},
           {n:"Radwa Khalifa", t:"Lead Marketing Operations Specialist", loc:"Egypt", shared:"Paid Media"}
         ]},
         {subteam:true, label:"Paid Media", members:[
-          {n:"Ricardo Vilanova", t:"Sr Specialist, Social Media Marketing", loc:"Colombia", shared:"Social Media"}
+          {n:"Ricardo Vilanova", t:"Senior Specialist, Social Media Marketing", loc:"Colombia", shared:"Social Media"}
         ]},
         {subteam:true, label:"Social Media", members:[
           {n:"Amir Andrawes", t:"Social Media Lead", loc:"Egypt"}
@@ -640,8 +658,8 @@ function sortLabel(x){ return x.subteam ? x.label : x.n; }
 
 const totalPeople = 1 + RAW_DEPARTMENTS.length + RAW_DEPARTMENTS.reduce((sum,d) => sum + countReal(d.members), 0); // +1 for Marji
 document.getElementById('marjiTotal').textContent = `${totalPeople} people across ${RAW_DEPARTMENTS.length} teams`;
-document.getElementById('marjiFlag').innerHTML = FLAGS["United States & Canada"];
-document.getElementById('johnFlag').innerHTML = FLAGS["United States & Canada"];
+document.getElementById('marjiFlag').innerHTML = FLAGS["United States"];
+document.getElementById('johnFlag').innerHTML = FLAGS["United States"];
 
 const legend = document.getElementById('legend');
 LOCATION_ORDER.forEach(label => {
@@ -702,6 +720,8 @@ function buildOvCol(dept){
       const pFlag = m.tbh ? TBH_ICON : (FLAGS[m.loc] || '');
       const row = document.createElement('div');
       row.className = 'ov-person' + (m.tbh ? ' tbh' : '');
+      row.dataset.name = norm(m.n);
+      row.dataset.title = norm(m.t || '');
       row.innerHTML = `<span class="p-flag">${pFlag}</span><div class="ov-p-info"><div class="ov-p-name">${m.n}</div><div class="ov-p-title">${m.t}</div></div>`;
       body.appendChild(row);
     });
@@ -741,12 +761,14 @@ function setView(mode){
 }
 
 function exitDrill(){
+  searchInput.value = ''; searchOrg('');
   drillDept = null;
   document.body.classList.remove('drill-mode');
   currentView = 'overview';
 }
 
 function drillInto(dept, source){
+  searchInput.value = ''; searchOrg('');
   drillDept = dept;
   drillSource = source || 'overview';
   setView('drill');
@@ -913,7 +935,7 @@ function renderDrill(dept){
   marji.className = 'drill-marji';
   const marjiCard = document.createElement('div');
   marjiCard.className = 'ht-card ht-cmo';
-  marjiCard.innerHTML = `${FLAGS["United States & Canada"]}<div class="ht-card-info"><div class="ht-name">Marji Chimes</div><div class="ht-title">Group Vice President</div></div>`;
+  marjiCard.innerHTML = `${FLAGS["United States"]}<div class="ht-card-info"><div class="ht-name">Marji Chimes</div><div class="ht-title">Group Vice President</div></div>`;
   marji.appendChild(marjiCard);
   const drop = document.createElement('div');
   drop.className = 'drill-drop';
@@ -991,6 +1013,59 @@ document.getElementById('drillNext').addEventListener('click', () => slideTo('ne
 function handleSaveAsPdf(){
   window.print();
 }
+
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+
+function searchOrg(query){
+  const q = norm(query.trim());
+  const ovItems = document.querySelectorAll('.ov-item');
+  const ovPersons = document.querySelectorAll('.ov-person');
+  const htCards = document.querySelectorAll('.ht-card:not(.ht-cmo):not(.ht-group)');
+
+  // Clear previous
+  ovItems.forEach(el => el.classList.remove('search-dim','search-hit'));
+  ovPersons.forEach(el => el.classList.remove('search-match'));
+  htCards.forEach(el => el.classList.remove('search-match'));
+
+  if(!q) return;
+
+  // Overview: check each column
+  ovItems.forEach((item, i) => {
+    const dept = RAW_DEPARTMENTS[i];
+    const dirMatch = norm(dept.name).includes(q) || norm(dept.role).includes(q);
+
+    // Check person rows by data attributes
+    const persons = item.querySelectorAll('.ov-person');
+    let hasMatch = dirMatch;
+    persons.forEach(p => {
+      const nameMatch = (p.dataset.name || '').includes(q);
+      const titleMatch = (p.dataset.title || '').includes(q);
+      if(nameMatch || titleMatch){
+        p.classList.add('search-match');
+        hasMatch = true;
+      }
+    });
+
+    item.classList.add(hasMatch ? 'search-hit' : 'search-dim');
+  });
+
+  // Drill view: highlight matching cards
+  htCards.forEach(card => {
+    const name = card.querySelector('.ht-name');
+    const title = card.querySelector('.ht-title');
+    const n = norm(name ? name.textContent : '');
+    const t = norm(title ? title.textContent : '');
+    if(n.includes(q) || t.includes(q)){
+      card.classList.add('search-match');
+    }
+  });
+}
+
+searchInput.addEventListener('input', () => searchOrg(searchInput.value));
+searchInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){ searchInput.value = ''; searchOrg(''); searchInput.blur(); }
+});
 </script>
 
 </body>

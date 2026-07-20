@@ -97,7 +97,75 @@ main{ max-width:1360px; margin:0 auto; padding:36px 28px 80px; }
 .name-row{ display:flex; align-items:center; justify-content:center; gap:7px; }
 .lead-card .name{ font-weight:800; font-size:16.5px; color:var(--navy); }
 .lead-card .role{ font-size:12.5px; color:#67707A; font-style:italic; margin-top:2px; }
-.total-pill{ margin-top:8px; display:inline-block; font-size:11px; font-weight:700; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, white); border-radius:100px; padding:4px 12px; }
+.total-pill{ margin-top:8px; display:inline-block; font-size:11px; font-weight:700; color:var(--blue); background:color-mix(in srgb, var(--blue) 12%, white); border-radius:100px; padding:4px 12px; cursor:pointer; transition:transform .2s, box-shadow .2s, background .2s; }
+.total-pill:hover{ transform:scale(1.06); box-shadow:0 2px 10px rgba(0,125,255,.25); background:color-mix(in srgb, var(--blue) 18%, white); }
+
+/* Fun facts modal */
+.ff-overlay{
+  position:fixed; inset:0; z-index:200;
+  background:rgba(0,37,81,.5); backdrop-filter:blur(4px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.ff-overlay.open{ opacity:1; pointer-events:auto; }
+.ff-modal{
+  background:var(--offwhite); border-radius:16px; max-width:640px; width:92vw;
+  max-height:82vh; overflow-y:auto; overflow-x:hidden;
+  box-shadow:0 20px 60px rgba(0,37,81,.25);
+  position:relative;
+  transform:translateY(12px); transition:transform .25s;
+}
+.ff-overlay.open .ff-modal{ transform:translateY(0); }
+.ff-header{
+  background:var(--navy); padding:28px 36px 22px;
+  border-radius:16px 16px 0 0; position:sticky; top:0; z-index:1;
+}
+.ff-title{
+  font-size:19px; font-weight:900; color:#fff;
+  margin:0 0 4px; letter-spacing:-.02em;
+}
+.ff-subtitle{
+  font-size:12px; color:rgba(255,255,255,.45); font-weight:600;
+  letter-spacing:.04em; text-transform:uppercase;
+  margin:0;
+}
+.ff-close{
+  position:absolute; top:16px; right:16px;
+  background:none; border:none; cursor:pointer;
+  color:rgba(255,255,255,.5); font-size:22px; line-height:1;
+  width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+  border-radius:8px; transition:background .12s, color .12s;
+}
+.ff-close:hover{ background:rgba(255,255,255,.1); color:#fff; }
+.ff-body{ padding:20px 24px 28px; display:flex; flex-direction:column; gap:10px; }
+.ff-card{
+  background:#fff; border-radius:10px; padding:14px 18px;
+  box-shadow:0 1px 3px rgba(0,37,81,.04);
+  --accent:var(--blue);
+}
+.ff-card:nth-child(2){ --accent:var(--orange); }
+.ff-card:nth-child(3){ --accent:var(--teal); }
+.ff-card:nth-child(4){ --accent:var(--yellow); }
+.ff-card:nth-child(5){ --accent:#534AB7; }
+.ff-card:nth-child(6){ --accent:var(--blue); }
+.ff-card:nth-child(7){ --accent:var(--orange); }
+.ff-card:nth-child(8){ --accent:var(--teal); }
+.ff-card:nth-child(9){ --accent:var(--yellow); }
+.ff-card:nth-child(10){ --accent:#534AB7; }
+.ff-card h3{
+  font-size:13.5px; font-weight:800; color:var(--accent);
+  margin:0 0 5px;
+  display:flex; align-items:center; gap:8px;
+}
+.ff-card h3::before{
+  content:''; display:inline-block;
+  width:8px; height:8px; border-radius:50%;
+  background:var(--accent); flex-shrink:0;
+}
+.ff-card p{
+  font-size:12.5px; color:#3A4550; line-height:1.6;
+  margin:0; padding-left:16px;
+}
 
 .trunk{ width:1.5px; height:28px; background:#E1DED8; margin:0 auto; }
 .branch-label{ display:flex; align-items:center; gap:14px; margin:0 auto 26px; }
@@ -499,6 +567,69 @@ body:not(.drill-mode) .drill-wrap{ display:none; }
   <div class="legend-wrap"><div class="legend" id="legend"></div></div>
 
 </main>
+
+<div class="ff-overlay" id="ffOverlay">
+  <div class="ff-modal">
+    <div class="ff-header">
+      <button class="ff-close" id="ffClose">&times;</button>
+      <div class="ff-title">Things You Probably Didn't Know About Us</div>
+      <div class="ff-subtitle">TTEC Marketing Team by the Numbers</div>
+    </div>
+    <div class="ff-body">
+
+      <div class="ff-card">
+        <h3>The Juan Situation</h3>
+        <p>There are three Juans on this team: Caicedo in Portfolio Growth, Arellano in Demand Gen, and Escobar in Creative. If someone says "ask Juan," you're going to need a last name. We also have two Natalias, two Marias, and two Beths, but for some reason nobody ever gets confused about those.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>The Bagtas Duo</h3>
+        <p>Beth and Jayson Bagtas, both Creative Services Consultants, both in the Philippines, both on Nicolas's team. If you've ever gotten a creative asset from the Philippines, chances are a Bagtas touched it.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>Colombia runs this department</h3>
+        <p>31 of us sit in Colombia, making up 37% of the team. The US is close behind at 33%. Together, Bogotá and the States account for 70% of the entire org. The other 30% is spread across the Philippines, Egypt, the UK, Ireland, India, and Canada.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>The Philippines is basically Creative's satellite office</h3>
+        <p>All 11 of our Philippines-based teammates work in Creative. Nicolas Agudelo manages what is essentially a transatlantic studio spanning Bogotá, the US, and Manila.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>Speaking of Creative</h3>
+        <p>At 19 people (plus 2 open roles), it's the largest team by far. Nearly 1 in 4 people in Marketing sits in Creative. Nicolas, if you're reading this: yes, we know.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>The title extremes</h3>
+        <p>The longest title on the team, at 67 characters, belongs to Terra Gullet Brown: "Global Art Director, Internal Communications and Talent Acquisition." The shortest, at just 15 characters, is "Lead Specialist," shared by Ayman Ali and Donn Santiago, two people in completely different teams and countries who probably don't know they're title twins.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>The word "Marketing" appears in 25 of our titles</h3>
+        <p>Which makes sense, given that we are, in fact, the Marketing department. The runner-up is "Manager" at 18, followed by "Senior" at 17. "Designer" and "Graphic" are tied at 8 each, courtesy of Nicolas's empire.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>We speak more than you think</h3>
+        <p>English is the working language, but this team natively speaks at least Spanish, Tagalog, Arabic, and Hindi. If we ever need to launch a campaign in four languages at once, we wouldn't have to leave the building.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>The weather gap is absurd</h3>
+        <p>On any given day, someone on this team is at 38°C (100°F) in Cairo while someone else is at 14°C (57°F) in Dublin. Bogotá sits comfortably in the middle pretending the extremes don't exist. When someone says "nice weather today" on a team call, it means something completely different depending on who's talking.</p>
+      </div>
+
+      <div class="ff-card">
+        <h3>We span 5 time zones on a normal workday</h3>
+        <p>From Dublin and Cairo to Bogotá, Colorado, and Manila. Somewhere on this team, someone is always either starting their day or wrapping it up.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <script>
 const LOCATION_ORDER = ["Canada","Colombia","Egypt","India","Ireland","Philippines","United Kingdom","United States"];
@@ -1065,6 +1196,22 @@ function searchOrg(query){
 searchInput.addEventListener('input', () => searchOrg(searchInput.value));
 searchInput.addEventListener('keydown', (e) => {
   if(e.key === 'Escape'){ searchInput.value = ''; searchOrg(''); searchInput.blur(); }
+});
+
+// Fun facts modal
+const ffOverlay = document.getElementById('ffOverlay');
+const ffClose = document.getElementById('ffClose');
+document.getElementById('marjiTotal').addEventListener('click', () => {
+  ffOverlay.classList.add('open');
+});
+ffClose.addEventListener('click', () => {
+  ffOverlay.classList.remove('open');
+});
+ffOverlay.addEventListener('click', (e) => {
+  if(e.target === ffOverlay) ffOverlay.classList.remove('open');
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && ffOverlay.classList.contains('open')) ffOverlay.classList.remove('open');
 });
 </script>
 

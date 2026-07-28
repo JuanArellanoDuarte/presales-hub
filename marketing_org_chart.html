@@ -668,14 +668,16 @@ const TBH_ICON = '<span class="flag-icon" style="box-shadow:none;"><svg viewBox=
 
 const RAW_DEPARTMENTS = [
   {name:"Hernan Repetto", role:"Portfolio Growth", location:"United Kingdom", members:[
-      {n:"Daniela Alfaro", t:"Growth Marketing Manager - Retail & Travel", loc:"Colombia"},
-      {n:"Juan Caicedo", t:"Growth Marketing Manager - Healthcare & Pub Sec", loc:"Colombia"},
-      {n:"Laura Diaz", t:"Growth Marketing Manager - TMC", loc:"Colombia"},
-      {n:"Miguel Faudel", t:"Growth Marketing Manager - BFSI", loc:"Colombia"},
-      {n:"Natalia Acosta", t:"Growth Marketing Manager - RevGen", loc:"Colombia"},
-      {n:"Sarah Leigh Roddis", t:"Growth Marketing Automotive & Strategic Projects Manager", loc:"United Kingdom", sub:{label:"", members:[
-        {n:"Ayman Ali", t:"Lead Specialist", loc:"Egypt"}
-      ]}},
+      {subteam:true, label:"Growth Marketing", members:[
+        {n:"Daniela Alfaro", t:"Growth Marketing Manager - Retail & Travel", loc:"Colombia"},
+        {n:"Juan Caicedo", t:"Growth Marketing Manager - Healthcare & Pub Sec", loc:"Colombia"},
+        {n:"Laura Diaz", t:"Growth Marketing Manager - TMC", loc:"Colombia"},
+        {n:"Miguel Faudel", t:"Growth Marketing Manager - BFSI", loc:"Colombia"},
+        {n:"Natalia Acosta", t:"Growth Marketing Manager - RevGen", loc:"Colombia"},
+        {n:"Sarah Leigh Roddis", t:"Growth Marketing Automotive & Strategic Projects Manager", loc:"United Kingdom", sub:{label:"", members:[
+          {n:"Ayman Ali", t:"Lead Specialist", loc:"Egypt"}
+        ]}}
+      ]},
       {subteam:true, label:"Events & Partners", members:[
         {n:"Maria Jimenez", t:"Events & Partners Manager", loc:"Colombia"}
       ]}
@@ -1010,9 +1012,9 @@ function renderVtNode(m, container, isRoot){
     const kids = document.createElement('div');
     kids.className = 'vt-kids';
 
-    // If mixed branches and leaves, render all individually in sorted order
-    // If only leaves, use compact grid
-    if(branches.length > 0 && leaves.length > 0){
+    // If mixed branches and leaves with few leaves, render individually for alpha order
+    // If many leaves, use compact grid (branches render in their sorted position)
+    if(branches.length > 0 && leaves.length > 0 && leaves.length <= 2){
       const nonSubteam = sorted.filter(c => !c.subteam);
       nonSubteam.forEach(child => {
         const wrap = document.createElement('div');

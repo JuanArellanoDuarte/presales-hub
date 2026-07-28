@@ -780,7 +780,9 @@ const RAW_DEPARTMENTS = [
   {name:"Jeff Goeke", role:"Executive Projects", location:"United States", members:[]},
   {name:"Meredith Matthews", role:"Public Relations", location:"United States", members:[]},
   {name:"Miles White", role:"Digital Marketing", location:"United States", members:[
-      {n:"Donn Santiago", t:"Lead Specialist", loc:"Philippines"},
+      {subteam:true, label:"QA and CMS", members:[
+        {n:"Donn Santiago", t:"Lead Specialist", loc:"Philippines"}
+      ]},
       {n:"Mark Musante", t:"Senior Consultant, Multimedia", loc:"United States", sub:{label:"Web Dev & CMS", members:[
         {n:"Sunandha Kanala", t:"Specialist, Multimedia", loc:"India"}
       ]}},

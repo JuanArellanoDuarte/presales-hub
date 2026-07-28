@@ -332,7 +332,7 @@ body.drill-mode main{ max-width:100%; padding-left:16px; padding-right:16px; }
   border:1.5px solid #E1DED8; padding:8px 12px 7px;
   box-shadow:0 1px 3px rgba(0,37,81,.05);
   display:flex; flex-direction:column; align-items:center;
-  text-align:center; min-width:0; max-width:240px;
+  text-align:center; min-width:0; max-width:280px;
 }
 .ht-card .flag-icon{ width:16px; height:11px; margin-bottom:2px; }
 .ht-card .flag-pair{ margin-bottom:2px; }
@@ -461,18 +461,25 @@ body.drill-mode main{ max-width:100%; padding-left:16px; padding-right:16px; }
 
 
 @media print{
-  @page{ size:A4 landscape; margin:10mm 10mm; }
+  @page{ size:A4 landscape; margin:8mm; }
   .sh{ position:static; background:none; border-bottom:2px solid var(--blue); padding:8px 16px; height:auto; }
   .sh-brand, .sh-actions{ display:none !important; }
   .sh-title h1{ color:var(--navy); }
   .sh-updated{ color:#8A94A3; }
   body{ background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-  main{ padding:10px 0 0; }
+  main{ padding:10px 0 0; max-width:100%; }
   .leadership{ margin-bottom:0; gap:12px; }
   .lead-card{ padding:8px 18px; }
   .trunk{ height:12px; }
   .branch-label{ margin:0 auto 12px; }
   .legend-wrap{ display:none !important; }
+  .ff-overlay{ display:none !important; }
+
+  /* Force flag colors in print */
+  .flag-icon, .flag-icon svg, .ov-banner, .ht-card.ht-group, .ht-card.ht-active,
+  .ht-card.ht-cmo, .ht-card.ht-root, .vt-col, .total-pill, .lead-card{
+    -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact;
+  }
 
   /* Overview print: fill maximum space on landscape */
   body:not(.drill-mode) .overview-wrap{ overflow:visible; padding:0; }
@@ -491,14 +498,28 @@ body.drill-mode main{ max-width:100%; padding-left:16px; padding-right:16px; }
   body:not(.drill-mode) .ov-head .ov-flag .flag-icon{ width:10px; height:7px; }
   body:not(.drill-mode) .ov-person .flag-icon{ width:9px; height:6px; }
 
-  /* Drill mode print */
+  /* Drill mode print: scale to fit page */
   body.drill-mode .drill-nav{ display:none; }
   body.drill-mode .drill-slide-side{ display:none; }
+  body.drill-mode .drill-wrap{ padding:0; }
   body.drill-mode .drill-tree{ overflow:visible; }
   body.drill-mode .drill-carousel{ display:flex; justify-content:center; }
   body.drill-mode .drill-marji{ opacity:1; }
+  body.drill-mode .drill-slide{ transform-origin:top center; }
   body.drill-mode .ht-card{ box-shadow:none; border-width:1px; }
   body.drill-mode .ht-card .flag-icon{ width:12px; height:8px; }
+  body.drill-mode .vt-child{ padding:0 10px; }
+  body.drill-mode .vt-kids{ padding-top:20px; }
+  body.drill-mode .vt-kids::before{ height:10px; }
+  body.drill-mode .vt-child::after{ top:-10px; }
+  body.drill-mode .vt-child::before{ top:-10px; height:10px; }
+  body.drill-mode .ht-card{ padding:5px 8px 4px; }
+  body.drill-mode .ht-card-info .ht-name{ font-size:11px; }
+  body.drill-mode .ht-card-info .ht-title{ font-size:9px; }
+  body.drill-mode .ht-card.ht-group{ padding:4px 8px 3px; margin-bottom:8px; }
+  body.drill-mode .ht-card.ht-group .ht-name{ font-size:9px; }
+  body.drill-mode .drill-team-name{ font-size:20px; margin-bottom:8px; }
+  body.drill-mode .vt-col{ padding:6px 8px; gap:4px 10px; }
 }
 
 @media (max-width:640px){

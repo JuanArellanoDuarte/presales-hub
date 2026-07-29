@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wink Room Booking</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='200 300 860 1050'><rect x='0' y='0' width='1550' height='1550' fill='%23002551'/><path d='m548.6 389.4h79c10.9 0 19.1 8.1 19.1 19v80.3c0 10.9-8.2 19.1-19.1 19.1h-79c-10.9 0-19-8.2-19-19.1v-80.3c0-10.9 8.1-19 19-19z' fill='white'/><path d='m1000.6 977.5h-2.7c-39.5 0-167.4-10.9-167.4-143v-325.3h89.8c10.9 0 20.4-9.6 20.4-20.5v-77.6c0-10.8-9.5-20.4-20.4-20.4h-89.8v-145.7c0-10.8-9.6-20.4-20.5-20.4h-81.6c-10.9 0-20.5 9.6-20.5 20.5v588.1c0 77.6 27.3 144.3 79 190.6 47.6 43.5 115.7 68.1 189.2 68.1 73.5 0 17.7 0 25.9 0 10.9 0 17.7-9.6 17.7-20.5v-74.8c0-10.9-9.5-20.5-20.4-20.5z' fill='white'/><path d='m1000.6 1208.9c-115.7 5.5-212.4-25.8-292.7-98-25.8-23.1-39.4-39.5-51.7-69.4-9.5-20.5-9.5-39.5-34-39.5-24.5 0-72.2 0-72.2 0-12.2 0-21.8 10.9-20.4 23.1 1.4 10.9 4.1 23.2 9.5 40.9 65.4 174.2 280.5 269.5 458.8 258.6 13.6 0 21.8-8.1 21.8-20.4v-74.9c0-10.8-9.5-20.4-20.4-20.4z' fill='white'/></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --navy:#002551;
+    --blue:#007DFF;
+    --orange:#D94806;
+    --teal:#5CECD3;
+    --yellow:#FCA941;
+    --offwhite:#F9F7F5;
+    --shell-line:rgba(255,255,255,.08);
+
+    --bg:var(--offwhite);
+    --surface:#FFFFFF;
+    --surface-sunken:#F3F5F7;
+    --ink:var(--navy);
+    --ink2:#1A3D6B;
+    --muted:#647387;
+    --faint:#8A94A3;
+    --border:#E3E6EB;
+    --line:#EEF0F3;
+    --free:var(--teal);
+    --free-bg:#E3FBF6;
+    --free-strong:#004D3D;
+    --busy:var(--orange);
+    --busy-bg:#FDEADF;
+    --busy-strong:#D94806;
+    --accent:var(--blue);
+    --accent-strong:var(--navy);
+    --danger:var(--orange);
+    --shadow:0 1px 2px rgba(0,37,81,.04), 0 4px 16px rgba(0,37,81,.06);
+    --r-card:14px;
+    --r-ctl:9px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--navy);
+    color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* shell header */
+  .sh{
+    background:var(--navy);
+    padding:0 28px;
+    border-bottom:1px solid var(--shell-line);
+    display:flex;
+    align-items:center;
+    gap:14px;
+    height:60px;
+  }
+  .sh-divider{width:1px;height:22px;background:rgba(255,255,255,.18);}
+  .sh-sub{font-size:11px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase;}
+  .sh-stripe{height:3px;background:var(--blue);}
+
+  .page{background:var(--bg);}
+  .wrap{max-width:920px;margin:0 auto;padding:36px 24px 80px;}
+
+  /* header */
+  header{margin-bottom:28px;}
+  h1{
+    font-weight:900;
+    font-size:32px;
+    margin:0 0 6px;
+    letter-spacing:-0.03em;
+    color:var(--ink);
+  }
+  header p{margin:0;color:var(--muted);font-size:15px;}
+
+  /* section blocks */
+  .block{margin-bottom:36px;}
+  .block-book{margin-bottom:0;}
+  .section-head{display:flex;align-items:center;gap:9px;margin:0 0 16px;}
+  .section-head .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .section-head h2{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--ink);margin:0;}
+
+  /* time pair (hour + minute selects) */
+  .time-pair{display:flex;align-items:center;gap:6px;}
+  .time-pair select{width:auto;flex:1;}
+  .time-pair span{color:var(--faint);font-weight:700;}
+
+  /* room status cards */
+  .rooms{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin:28px 0 36px;
+  }
+  @media(max-width:760px){
+    .rooms{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));}
+  }
+  .room-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--r-card);
+    padding:18px 18px 16px;
+    position:relative;
+    overflow:hidden;
+    border-top:3px solid var(--ink2);
+    box-shadow:var(--shadow);
+    transition:box-shadow .12s, transform .12s;
+  }
+  .room-card:hover{box-shadow:0 4px 10px rgba(0,37,81,.10), 0 10px 22px rgba(0,37,81,.10); transform:translateY(-1px);}
+  .room-capacity{
+    font-size:11.5px;
+    color:var(--faint);
+    margin:2px 0 0;
+  }
+  .room-capacity span{font-weight:600; color:var(--muted);}
+  .book-this-room{
+    display:block;
+    width:100%;
+    text-align:left;
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--accent-strong);
+    background:none;
+    border:none;
+    border-top:1px solid var(--line);
+    margin-top:12px;
+    padding:10px 0 0;
+    cursor:pointer;
+  }
+  .book-this-room:hover{color:var(--blue);}
+  .room-card .door{
+    position:absolute;
+    top:16px;
+    right:16px;
+    width:26px;
+    height:26px;
+  }
+  .room-name-row{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+  .room-name{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:17px;
+    letter-spacing:-.01em;
+    background:transparent;
+    border:none;
+    color:var(--ink);
+    padding:2px 0;
+    width:75%;
+  }
+  .room-name:focus{outline:none;border-bottom:1px solid var(--border);}
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:600;
+    padding:4px 10px 4px 8px;
+    border-radius:20px;
+    margin-top:10px;
+  }
+  .status-pill.free{background:var(--free-bg);color:var(--free-strong);}
+  .status-pill.busy{background:var(--busy-bg);color:var(--busy-strong);}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .room-detail{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5;}
+  .room-detail b{color:var(--ink);font-weight:500;}
+  .room-next{font-size:12px;color:var(--faint);margin-top:6px;}
+
+  /* tabs */
+  .tabs{
+    display:inline-flex;
+    background:var(--surface-sunken);
+    padding:4px;
+    border-radius:12px;
+    gap:2px;
+    margin-bottom:22px;
+  }
+  .tab-btn{
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--muted);
+    background:none;
+    border:none;
+    padding:9px 22px;
+    border-radius:9px;
+    cursor:pointer;
+  }
+  .tab-btn.active{background:var(--surface);color:var(--accent-strong);box-shadow:var(--shadow);}
+
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+
+  /* form */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--r-card);
+    padding:24px;
+    box-shadow:var(--shadow);
+  }
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-grid .full{grid-column:1/-1;}
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:6px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  input[type=text], input[type=date], select, textarea{
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:var(--r-ctl);
+    background:var(--surface-sunken);
+    padding:9px 11px;
+    font-size:14px;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    background:var(--surface);
+  }
+  textarea{resize:vertical;min-height:54px;}
+  .field{margin-bottom:0;}
+  .room-picker{display:flex;gap:8px;flex-wrap:wrap;}
+  .room-opt{
+    flex:1 1 140px;
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:10px 16px;
+    font-size:13px;
+    font-weight:600;
+    line-height:1.25;
+    cursor:pointer;
+    background:var(--surface-sunken);
+    color:var(--muted);
+    transition:background .12s, color .12s, border-color .12s;
+  }
+  .room-opt:hover:not(.selected){background:#E9EDF1;color:var(--ink2);}
+  .room-opt.selected{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .submit-row{display:flex;align-items:center;justify-content:space-between;margin-top:20px;}
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:11px 20px;
+    border-radius:var(--r-ctl);
+    border:none;
+    cursor:pointer;
+    background:var(--accent);
+    color:#fff;
+  }
+  .btn:hover{background:var(--accent-strong);}
+  .form-msg{font-size:13px;font-weight:500;min-height:18px;}
+  .form-msg.error, .form-msg.ok{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:13.5px;
+    font-weight:700;
+    padding:9px 16px;
+    border-radius:10px;
+  }
+  .form-msg.error{color:var(--busy-strong);background:var(--busy-bg);}
+  .form-msg.ok{color:var(--free-strong);background:var(--free-bg);}
+
+  /* bookings list */
+  .filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .chip{
+    font-size:12px;
+    font-weight:500;
+    padding:6px 12px;
+    border-radius:20px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+  .day-group{margin-bottom:22px;}
+  .day-label{
+    font-size:11.5px;
+    font-weight:800;
+    color:var(--ink2);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-bottom:8px;
+  }
+  .booking-row{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-left:4px solid var(--accent);
+    border-radius:12px;
+    padding:13px 16px 13px 14px;
+    margin-bottom:8px;
+    box-shadow:var(--shadow);
+  }
+  .booking-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .booking-room{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink);
+    min-width:0;
+  }
+  .booking-room .room-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .booking-room .rn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .booking-time{
+    font-variant-numeric:tabular-nums;
+    font-size:13px;
+    font-weight:800;
+    color:var(--ink2);
+    background:var(--surface-sunken);
+    padding:4px 11px;
+    border-radius:8px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .booking-bottom{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .booking-mid{flex:1;min-width:0;}
+  .booking-person{font-size:13.5px;color:var(--muted);margin:0;}
+  .booking-person b{color:var(--ink2);font-weight:600;}
+  .booking-purpose{font-size:13px;color:var(--faint);margin:2px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cancel-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .cancel-btn:hover{border-color:var(--danger);color:var(--danger);}
+  .empty{
+    text-align:center;
+    color:var(--faint);
+    font-size:14px;
+    padding:40px 0;
+  }
+  .loading{color:var(--faint);font-size:13px;padding:20px 0;}
+  @media(max-width:600px){
+    .form-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="sh">
+  <svg width="30" height="30" viewBox="200 320 850 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="m548.6 389.4h79c10.9 0 19.1 8.1 19.1 19v80.3c0 10.9-8.2 19.1-19.1 19.1h-79c-10.9 0-19-8.2-19-19.1v-80.3c0-10.9 8.1-19 19-19z" fill="white"/>
+    <path d="m1000.6 977.5h-2.7c-39.5 0-167.4-10.9-167.4-143v-325.3h89.8c10.9 0 20.4-9.6 20.4-20.5v-77.6c0-10.8-9.5-20.4-20.4-20.4h-89.8v-145.7c0-10.8-9.6-20.4-20.5-20.4h-81.6c-10.9 0-20.5 9.6-20.5 20.5v588.1c0 77.6 27.3 144.3 79 190.6 47.6 43.5 115.7 68.1 189.2 68.1 73.5 0 17.7 0 25.9 0 10.9 0 17.7-9.6 17.7-20.5v-74.8c0-10.9-9.5-20.5-20.4-20.5z" fill="white"/>
+    <path d="m1000.6 1208.9c-115.7 5.5-212.4-25.8-292.7-98-25.8-23.1-39.4-39.5-51.7-69.4-9.5-20.5-9.5-39.5-34-39.5-24.5 0-72.2 0-72.2 0-12.2 0-21.8 10.9-20.4 23.1 1.4 10.9 4.1 23.2 9.5 40.9 65.4 174.2 280.5 269.5 458.8 258.6 13.6 0 21.8-8.1 21.8-20.4v-74.9c0-10.8-9.5-20.4-20.4-20.4z" fill="white"/>
+  </svg>
+  <div class="sh-divider"></div>
+  <span class="sh-sub">Wink Office</span>
+</header>
+<div class="sh-stripe"></div>
+
+<div class="page">
+<div class="wrap">
+
+  <header>
+    <h1>Room Booking</h1>
+    <p>Check availability and book a room in seconds.</p>
+  </header>
+
+  <section class="block">
+    <div class="section-head"><span class="dot" style="background:var(--teal)"></span><h2>Room Availability</h2></div>
+    <div class="rooms" id="roomsGrid"></div>
+  </section>
+
+  <section class="block block-book">
+    <div class="section-head"><span class="dot" style="background:var(--blue)"></span><h2>Book a Space</h2></div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="book">Book</button>
+      <button class="tab-btn" data-tab="view">View Bookings</button>
+    </div>
+
+    <section class="panel active" id="panel-book">
+      <div class="card">
+        <div class="form-grid">
+          <div class="field full">
+            <label>Room</label>
+            <div class="room-picker" id="roomPicker"></div>
+          </div>
+          <div class="field full">
+            <label>Your Name</label>
+            <input type="text" id="fName" placeholder="Full name">
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="fDate">
+          </div>
+          <div class="field"></div>
+          <div class="field">
+            <label>Start Time</label>
+            <div class="time-pair">
+              <select id="fStartH"></select>
+              <span>:</span>
+              <select id="fStartM"></select>
+            </div>
+          </div>
+          <div class="field">
+            <label>End Time</label>
+            <div class="time-pair">
+              <select id="fEndH"></select>
+              <span>:</span>
+              <select id="fEndM"></select>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Purpose (optional)</label>
+            <textarea id="fPurpose" placeholder="e.g. client meeting, team standup..."></textarea>
+          </div>
+        </div>
+        <div class="submit-row">
+          <span class="form-msg" id="formMsg"></span>
+          <button class="btn" id="submitBtn">Book Room</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-view">
+      <div class="filter-row" id="filterRow"></div>
+      <div id="bookingsList"><p class="loading">Loading bookings...</p></div>
+      <button class="cancel-btn" id="exportBtn" style="margin-top:12px;">⭳ Download Excel</button>
+    </section>
+  </section>
+
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB-0oUb_YyMLYLUrZ2bfpbLW251coQLD24",
+  authDomain: "wink-55229.firebaseapp.com",
+  projectId: "wink-55229",
+  storageBucket: "wink-55229.firebasestorage.app",
+  messagingSenderId: "64986588890",
+  appId: "1:64986588890:web:06f7c871fde3c296e527e3"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
+const DEFAULT_ROOMS = [
+  {id:'r1', name:'Apollo', color:'blue'},
+  {id:'r2', name:'Voyager', color:'teal'},
+  {id:'r3', name:'Artemis', color:'yellow'},
+  {id:'r4', name:'VP of Marketing Office', color:'purple'},
+  {id:'r5', name:'Growth & Business Director Office', color:'gray'}
+];
+const TAG_COLORS = {
+  blue:{bg:'#D6EEFF', fg:'#004C99'},
+  teal:{bg:'#E3FBF6', fg:'#004D3D'},
+  yellow:{bg:'#FFF1DD', fg:'#8A5100'},
+  purple:{bg:'#EDEAF5', fg:'#453D66'},
+  gray:{bg:'#F1F2F4', fg:'#4A5568'}
+};
+
+let rooms = DEFAULT_ROOMS;
+let bookings = [];
+let selectedRoomId = null;
+let currentFilter = 'all';
+
+function pad(n){return String(n).padStart(2,'0');}
+function todayStr(){const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}
+function nowMinutes(){const d=new Date();return d.getHours()*60+d.getMinutes();}
+function toMinutes(t){const [h,m]=t.split(':').map(Number);return h*60+m;}
+function fmtDateLabel(dateStr){
+  const [y,m,d]=dateStr.split('-').map(Number);
+  const dt=new Date(y,m-1,d);
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const today=todayStr();
+  if(dateStr===today) return 'Today · '+months[m-1]+' '+d;
+  return days[dt.getDay()]+' · '+months[m-1]+' '+d;
+}
+
+async function loadData(){
+  const roomsSnap = await getDocs(collection(db,'rooms'));
+  if(roomsSnap.empty){
+    for(const r of DEFAULT_ROOMS){
+      await setDoc(doc(db,'rooms',r.id), {name:r.name, color:r.color});
+    }
+  }
+
+  onSnapshot(collection(db,'rooms'), (snap)=>{
+    rooms = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>a.id.localeCompare(b.id));
+    if(!selectedRoomId && rooms.length) selectedRoomId = rooms[0].id;
+    renderAll();
+  });
+
+  onSnapshot(collection(db,'bookings'), (snap)=>{
+    bookings = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderAll();
+  });
+}
+
+async function saveRoom(room){
+  try{ await setDoc(doc(db,'rooms',room.id), {name:room.name, color:room.color}); }
+  catch(e){ console.error('Could not save room', e); }
+}
+
+function currentBookingFor(roomId){
+  const today=todayStr(), now=nowMinutes();
+  return bookings.find(b=>b.roomId===roomId && b.date===today && toMinutes(b.start)<=now && now<toMinutes(b.end));
+}
+function nextBookingFor(roomId){
+  const today=todayStr(), now=nowMinutes();
+  const upcoming = bookings
+    .filter(b=> b.date>today || (b.date===today && toMinutes(b.start)>now))
+    .filter(b=>b.roomId===roomId)
+    .sort((a,b)=> (a.date+a.start).localeCompare(b.date+b.start));
+  return upcoming[0];
+}
+
+function doorSVG(free){
+  const stroke = free ? '#004D3D' : '#D94806';
+  return `<svg class="door" viewBox="0 0 26 26" fill="none">
+    <rect x="6" y="3" width="14" height="20" rx="1.5" stroke="${stroke}" stroke-width="1.6"/>
+    ${free
+      ? `<path d="M6 3 L20 6 L20 20 L6 23" stroke="${stroke}" stroke-width="1.6" fill="none" opacity="0.55"/>`
+      : ``}
+    <circle cx="16" cy="13" r="1.1" fill="${stroke}"/>
+  </svg>`;
+}
+
+function renderRoomCards(){
+  const grid = document.getElementById('roomsGrid');
+  const active = document.activeElement;
+  if(active && active.classList && active.classList.contains('room-name')){
+    // someone is mid-edit here; skip the rebuild so we don't steal focus/cursor
+    return;
+  }
+  grid.innerHTML = rooms.map(room=>{
+    const busy = currentBookingFor(room.id);
+    const next = nextBookingFor(room.id);
+    const free = !busy;
+    return `<div class="room-card">
+      ${doorSVG(free)}
+      <div class="room-name-row">
+        <input class="room-name" data-room="${room.id}" value="${escapeAttr(room.name)}">
+      </div>
+      <div class="room-capacity">👥 Capacity: <span>-- people</span></div>
+      <span class="status-pill ${free?'free':'busy'}">
+        <span class="status-dot"></span>${free?'Free now':'Occupied'}
+      </span>
+      ${busy ? `<div class="room-detail">With <b>${escapeHtml(busy.name)}</b> until <b>${busy.end}</b></div>` : ''}
+      ${!busy && next && next.date===todayStr() ? `<div class="room-next">Next booking today: ${next.start} — ${escapeHtml(next.name)}</div>` : ''}
+      ${!busy && next && next.date!==todayStr() ? `<div class="room-next">Next booking: ${fmtDateLabel(next.date)}, ${next.start}</div>` : ''}
+      ${!busy && !next ? `<div class="room-next">No upcoming bookings</div>` : ''}
+      <button class="book-this-room" data-room="${room.id}">Book this room →</button>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.room-name').forEach(inp=>{
+    inp.addEventListener('change', async (e)=>{
+      const id = e.target.dataset.room;
+      const room = rooms.find(r=>r.id===id);
+      if(room && e.target.value.trim()){
+        room.name = e.target.value.trim();
+        await saveRoom(room);
+      }
+    });
+    inp.addEventListener('blur', ()=>{
+      // catch up on any updates that arrived while this field was focused
+      renderAll();
+    });
+  });
+
+  grid.querySelectorAll('.book-this-room').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      selectedRoomId = btn.dataset.room;
+      renderRoomPicker();
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      document.querySelector('.tab-btn[data-tab="book"]').classList.add('active');
+      document.getElementById('panel-book').classList.add('active');
+      document.querySelector('.block-book').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+}
+
+function renderRoomPicker(){
+  const picker = document.getElementById('roomPicker');
+  picker.innerHTML = rooms.map(r=>`<div class="room-opt ${r.id===selectedRoomId?'selected':''}" data-room="${r.id}">${escapeHtml(r.name)}</div>`).join('');
+  picker.querySelectorAll('.room-opt').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      selectedRoomId = el.dataset.room;
+      renderRoomPicker();
+    });
+  });
+}
+
+function renderFilters(){
+  const row = document.getElementById('filterRow');
+  const opts = [{id:'all', label:'All Rooms'}, ...rooms.map(r=>({id:r.id, label:r.name}))];
+  row.innerHTML = opts.map(o=>`<div class="chip ${currentFilter===o.id?'active':''}" data-f="${o.id}">${escapeHtml(o.label)}</div>`).join('');
+  row.querySelectorAll('.chip').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      currentFilter = el.dataset.f;
+      renderFilters();
+      renderBookingsList();
+    });
+  });
+}
+
+function renderBookingsList(){
+  const container = document.getElementById('bookingsList');
+  const today = todayStr();
+  let list = bookings
+    .filter(b=> b.date > today || (b.date===today))
+    .filter(b=> currentFilter==='all' || b.roomId===currentFilter)
+    .sort((a,b)=> (a.date+a.start).localeCompare(b.date+b.start));
+
+  // drop bookings that already fully ended today
+  const now = nowMinutes();
+  list = list.filter(b => b.date !== today || toMinutes(b.end) > now);
+
+  if(list.length===0){
+    container.innerHTML = `<div class="empty">No upcoming bookings${currentFilter!=='all' ? ' for this room' : ''}.</div>`;
+    return;
+  }
+
+  const groups = {};
+  list.forEach(b=>{ (groups[b.date] = groups[b.date] || []).push(b); });
+
+  container.innerHTML = Object.keys(groups).map(date=>{
+    const rowsHtml = groups[date].map(b=>{
+      const room = rooms.find(r=>r.id===b.roomId) || {name:'Room', color:'blue'};
+      const tag = TAG_COLORS[room.color] || TAG_COLORS.blue;
+      return `<div class="booking-row" style="border-left-color:${tag.fg}">
+        <div class="booking-top">
+          <div class="booking-room">
+            <span class="room-dot" style="background:${tag.fg}"></span>
+            <span class="rn">${escapeHtml(room.name)}</span>
+          </div>
+          <div class="booking-time">${b.start}–${b.end}</div>
+        </div>
+        <div class="booking-bottom">
+          <div class="booking-mid">
+            <p class="booking-person">Booked by <b>${escapeHtml(b.name)}</b></p>
+            ${b.purpose ? `<p class="booking-purpose">${escapeHtml(b.purpose)}</p>` : ''}
+          </div>
+          <button class="cancel-btn" data-id="${b.id}">Cancel</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="day-group">
+      <div class="day-label">${fmtDateLabel(date)}</div>
+      ${rowsHtml}
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.cancel-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.id;
+      const b = bookings.find(x=>x.id===id);
+      if(!b) return;
+
+      if(btn.dataset.confirming !== '1'){
+        // first click: arm confirmation, no native dialog (blocked in sandboxed contexts)
+        btn.dataset.confirming = '1';
+        btn.textContent = 'Confirm?';
+        btn.style.borderColor = 'var(--danger)';
+        btn.style.color = 'var(--danger)';
+        clearTimeout(btn._resetTimer);
+        btn._resetTimer = setTimeout(()=>{
+          btn.dataset.confirming = '0';
+          btn.textContent = 'Cancel';
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 3000);
+        return;
+      }
+
+      // second click within the window: actually cancel
+      clearTimeout(btn._resetTimer);
+      btn.disabled = true;
+      btn.textContent = 'Cancelling...';
+      try{
+        await deleteDoc(doc(db,'bookings', id));
+        // onSnapshot will re-render the list once the delete propagates
+      }catch(e){
+        console.error('Could not cancel booking', e);
+        btn.disabled = false;
+        btn.dataset.confirming = '0';
+        btn.textContent = 'Retry cancel';
+        btn.style.borderColor = 'var(--danger)';
+        btn.style.color = 'var(--danger)';
+      }
+    });
+  });
+}
+
+function renderAll(){
+  renderRoomCards();
+  renderRoomPicker();
+  renderFilters();
+  renderBookingsList();
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+// form submit
+document.getElementById('submitBtn').addEventListener('click', async ()=>{
+  const name = document.getElementById('fName').value.trim();
+  const date = document.getElementById('fDate').value;
+  const start = document.getElementById('fStartH').value + ':' + document.getElementById('fStartM').value;
+  const end = document.getElementById('fEndH').value + ':' + document.getElementById('fEndM').value;
+  const purpose = document.getElementById('fPurpose').value.trim();
+  const msg = document.getElementById('formMsg');
+  msg.className = 'form-msg';
+
+  if(!name || !date || !start || !end){
+    msg.innerHTML = '⚠ Please fill in your name, date, and time.';
+    msg.classList.add('error');
+    return;
+  }
+  if(toMinutes(end) <= toMinutes(start)){
+    msg.innerHTML = '⚠ End time must be after start time.';
+    msg.classList.add('error');
+    return;
+  }
+  const conflict = bookings.find(b=>
+    b.roomId===selectedRoomId && b.date===date &&
+    toMinutes(start) < toMinutes(b.end) && toMinutes(end) > toMinutes(b.start)
+  );
+  if(conflict){
+    msg.innerHTML = `⚠ This room is already booked by ${escapeHtml(conflict.name)} from ${conflict.start} to ${conflict.end}.`;
+    msg.classList.add('error');
+    return;
+  }
+
+  const newBooking = {
+    id: 'b_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+    roomId: selectedRoomId,
+    name, date, start, end, purpose,
+    createdAt: new Date().toISOString()
+  };
+  try{
+    await setDoc(doc(db,'bookings', newBooking.id), {
+      roomId: newBooking.roomId, name, date, start, end, purpose, createdAt: newBooking.createdAt
+    });
+  }catch(e){
+    console.error('Could not save booking', e);
+    msg.innerHTML = '⚠ Could not save booking, check your connection and try again.';
+    msg.classList.add('error');
+    return;
+  }
+
+  msg.innerHTML = '✓ Booking confirmed.';
+  msg.classList.add('ok');
+  document.getElementById('fPurpose').value = '';
+  renderAll();
+  setTimeout(()=>{ msg.innerHTML=''; msg.className='form-msg'; }, 4000);
+});
+
+// tabs
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+document.getElementById('fDate').value = todayStr();
+
+(function initTimeSelects(){
+  const hourOpts = Array.from({length:24}, (_,h)=>pad(h));
+  const minOpts = ['00','15','30','45'];
+
+  ['fStartH','fEndH'].forEach(id=>{
+    document.getElementById(id).innerHTML = hourOpts.map(h=>`<option value="${h}">${h}</option>`).join('');
+  });
+  ['fStartM','fEndM'].forEach(id=>{
+    document.getElementById(id).innerHTML = minOpts.map(m=>`<option value="${m}">${m}</option>`).join('');
+  });
+
+  const nowTotal = nowMinutes();
+  const startTotal = Math.ceil(nowTotal/15)*15;
+  const endTotal = startTotal + 30;
+
+  document.getElementById('fStartH').value = pad(Math.floor(startTotal/60)%24);
+  document.getElementById('fStartM').value = pad(startTotal%60);
+  document.getElementById('fEndH').value = pad(Math.floor(endTotal/60)%24);
+  document.getElementById('fEndM').value = pad(endTotal%60);
+})();
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const rows = [...bookings]
+    .sort((a,b)=> (a.date+a.start).localeCompare(b.date+b.start))
+    .map(b=>{
+      const room = rooms.find(r=>r.id===b.roomId);
+      return {
+        Room: room ? room.name : 'Unknown',
+        Date: b.date,
+        Start: b.start,
+        End: b.end,
+        'Booked by': b.name,
+        Purpose: b.purpose || ''
+      };
+    });
+  if(rows.length===0){ rows.push({Room:'',Date:'',Start:'',End:'','Booked by':'',Purpose:'No bookings yet'}); }
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{wch:24},{wch:12},{wch:8},{wch:8},{wch:20},{wch:34}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Bookings');
+  const today = todayStr();
+  XLSX.writeFile(wb, `room-bookings-${today}.xlsx`);
+});
+
+loadData();
+setInterval(renderAll, 60000);
+</script>
+</body>
+</html>

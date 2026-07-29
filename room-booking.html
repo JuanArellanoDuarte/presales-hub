@@ -116,8 +116,10 @@
     font-size:11.5px;
     color:var(--faint);
     margin:2px 0 0;
+    display:flex;
+    align-items:center;
+    gap:4px;
   }
-  .room-capacity span{font-weight:600; color:var(--muted);}
   .book-this-room{
     display:block;
     width:100%;
@@ -147,13 +149,8 @@
     font-weight:700;
     font-size:17px;
     letter-spacing:-.01em;
-    background:transparent;
-    border:none;
     color:var(--ink);
-    padding:2px 0;
-    width:75%;
   }
-  .room-name:focus{outline:none;border-bottom:1px solid var(--border);}
   .status-pill{
     display:inline-flex;
     align-items:center;
@@ -479,11 +476,11 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 
 const DEFAULT_ROOMS = [
-  {id:'r1', name:'Apollo', color:'blue'},
-  {id:'r2', name:'Voyager', color:'teal'},
-  {id:'r3', name:'Artemis', color:'yellow'},
-  {id:'r4', name:'VP of Marketing Office', color:'purple'},
-  {id:'r5', name:'Growth & Business Director Office', color:'gray'}
+  {id:'r1', name:'Apollo', color:'blue', capacity:10},
+  {id:'r2', name:'Voyager', color:'teal', capacity:6},
+  {id:'r3', name:'Artemis', color:'yellow', capacity:3},
+  {id:'r4', name:'Atlantis', color:'purple', capacity:4},
+  {id:'r5', name:'Mercury', color:'gray', capacity:3}
 ];
 const TAG_COLORS = {
   blue:{bg:'#D6EEFF', fg:'#004C99'},
@@ -516,7 +513,7 @@ async function loadData(){
   const roomsSnap = await getDocs(collection(db,'rooms'));
   if(roomsSnap.empty){
     for(const r of DEFAULT_ROOMS){
-      await setDoc(doc(db,'rooms',r.id), {name:r.name, color:r.color});
+      await setDoc(doc(db,'rooms',r.id), {name:r.name, color:r.color, capacity:r.capacity});
     }
   }
 
@@ -530,11 +527,6 @@ async function loadData(){
     bookings = snap.docs.map(d=>({id:d.id, ...d.data()}));
     renderAll();
   });
-}
-
-async function saveRoom(room){
-  try{ await setDoc(doc(db,'rooms',room.id), {name:room.name, color:room.color}); }
-  catch(e){ console.error('Could not save room', e); }
 }
 
 function currentBookingFor(roomId){
@@ -563,11 +555,6 @@ function doorSVG(free){
 
 function renderRoomCards(){
   const grid = document.getElementById('roomsGrid');
-  const active = document.activeElement;
-  if(active && active.classList && active.classList.contains('room-name')){
-    // someone is mid-edit here; skip the rebuild so we don't steal focus/cursor
-    return;
-  }
   grid.innerHTML = rooms.map(room=>{
     const busy = currentBookingFor(room.id);
     const next = nextBookingFor(room.id);
@@ -575,9 +562,9 @@ function renderRoomCards(){
     return `<div class="room-card">
       ${doorSVG(free)}
       <div class="room-name-row">
-        <input class="room-name" data-room="${room.id}" value="${escapeAttr(room.name)}">
+        <span class="room-name">${escapeHtml(room.name)}</span>
       </div>
-      <div class="room-capacity">👥 Capacity: <span>-- people</span></div>
+      <div class="room-capacity">👥 Capacity: ${room.capacity != null ? room.capacity : '—'} people</div>
       <span class="status-pill ${free?'free':'busy'}">
         <span class="status-dot"></span>${free?'Free now':'Occupied'}
       </span>
@@ -588,21 +575,6 @@ function renderRoomCards(){
       <button class="book-this-room" data-room="${room.id}">Book this room →</button>
     </div>`;
   }).join('');
-
-  grid.querySelectorAll('.room-name').forEach(inp=>{
-    inp.addEventListener('change', async (e)=>{
-      const id = e.target.dataset.room;
-      const room = rooms.find(r=>r.id===id);
-      if(room && e.target.value.trim()){
-        room.name = e.target.value.trim();
-        await saveRoom(room);
-      }
-    });
-    inp.addEventListener('blur', ()=>{
-      // catch up on any updates that arrived while this field was focused
-      renderAll();
-    });
-  });
 
   grid.querySelectorAll('.book-this-room').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -739,7 +711,6 @@ function renderAll(){
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function escapeAttr(s){ return escapeHtml(s); }
 
 // form submit
 document.getElementById('submitBtn').addEventListener('click', async ()=>{

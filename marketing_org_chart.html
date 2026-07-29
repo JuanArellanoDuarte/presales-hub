@@ -375,6 +375,15 @@ body.drill-mode main{ max-width:100%; padding-left:16px; padding-right:16px; }
   border-radius:8px; padding:1px 8px; margin-top:2px;
 }
 
+/* Team Leader badge — overview only */
+.ov-tl-badge{
+  display:inline-block; font-size:8px; font-weight:700;
+  color:#185FA5; background:#E6F1FB;
+  border:0.5px solid #85B7EB;
+  border-radius:6px; padding:1px 5px; margin-left:4px;
+  vertical-align:middle; letter-spacing:.02em;
+}
+
 /* Marji CMO card */
 .ht-card.ht-cmo{
   border-color:var(--yellow); border-width:2px;
@@ -695,7 +704,7 @@ const RAW_DEPARTMENTS = [
         {n:"Laura Diaz", t:"Growth Marketing Manager - TMC", loc:"Colombia"},
         {n:"Miguel Faudel", t:"Growth Marketing Manager - BFSI", loc:"Colombia"},
         {n:"Natalia Acosta", t:"Growth Marketing Manager - RevGen", loc:"Colombia"},
-        {n:"Sarah Leigh Roddis", t:"Growth Marketing Automotive & Strategic Projects Manager", loc:"United Kingdom", sub:{label:"", members:[
+        {n:"Sarah Leigh Roddis", t:"Growth Marketing Automotive & Strategic Projects Manager", loc:"United Kingdom", tl:true, sub:{label:"", members:[
           {n:"Ayman Ali", t:"Marketing Projects Specialist", loc:"Egypt"}
         ]}}
       ]},
@@ -722,7 +731,7 @@ const RAW_DEPARTMENTS = [
   {name:"Charlie Schrier", role:"Market Activation", location:"United States", members:[
       {subteam:true, label:"Pre-Sales Team", members:[
         {n:"Jamie Pitts", t:"Demand Generation Senior Manager", loc:"United States"},
-        {n:"Juan Arellano", t:"Demand Generation Senior Manager", loc:"Colombia", sub:{label:"", members:[
+        {n:"Juan Arellano", t:"Demand Generation Senior Manager", loc:"Colombia", tl:true, sub:{label:"", members:[
             {n:"Carolina Giraldo", t:"Procurement Specialist", loc:"Colombia"},
             {n:"Kyle Hartman", t:"Pre-Sales Supervisor", loc:"Colombia"},
             {n:"Melissa Castiblanco", t:"Lead Development Representative", loc:"Colombia"},
@@ -749,7 +758,7 @@ const RAW_DEPARTMENTS = [
         {n:"Maria Salgado", t:"Administrative Assistant", loc:"Colombia"}
       ]},
       {subteam:true, label:"Delivery Project Management", members:[
-        {n:"Brooke Murphy", t:"Senior Marketing Project Manager", loc:"United States", sub:{label:"", members:[
+        {n:"Brooke Murphy", t:"Senior Marketing Project Manager", loc:"United States", tl:true, sub:{label:"", members:[
           {n:"Madhuvarsh Konduri", t:"Marketing Coordinator", loc:"India"}
         ]}},
         {n:"Fabian Munoz", t:"Marketing Project Manager", loc:"Colombia"},
@@ -782,22 +791,24 @@ const RAW_DEPARTMENTS = [
         {n:"UX Designer", t:"", loc:"", tbh:true}
       ]},
       {subteam:true, label:"Video", members:[
-        {n:"Angelo Panopio", t:"Employee Communications", loc:"Philippines"},
-        {n:"Beth Bagtas", t:"Creative Services Consultant", loc:"Philippines"},
-        {n:"Freddy Arias", t:"Motion Graphic Designer & Video Editor", loc:"Colombia"},
-        {n:"Greta Schliesman", t:"Video & Graphic Design", loc:"United States"},
-        {n:"Jared Jenkins", t:"Global Director of Video Marketing", loc:"United States"},
-        {n:"Jayson Bagtas", t:"Creative Services Consultant", loc:"Philippines"},
-        {n:"Sebastian Sarmiento", t:"Creative Producer", loc:"Colombia"}
+        {n:"Jared Jenkins", t:"Global Director of Video Marketing", loc:"United States", tl:true, sub:{label:"", members:[
+          {n:"Angelo Panopio", t:"Employee Communications", loc:"Philippines"},
+          {n:"Beth Bagtas", t:"Creative Services Consultant", loc:"Philippines"},
+          {n:"Freddy Arias", t:"Motion Graphic Designer & Video Editor", loc:"Colombia"},
+          {n:"Greta Schliesman", t:"Video & Graphic Design", loc:"United States"},
+          {n:"Jayson Bagtas", t:"Creative Services Consultant", loc:"Philippines"},
+          {n:"Sebastian Sarmiento", t:"Creative Producer", loc:"Colombia"}
+        ]}}
       ]},
       {subteam:true, label:"Employer Brand", members:[
-        {n:"Chester Blanco", t:"Senior Graphic Designer", loc:"Philippines"},
-        {n:"Constantine Gulmatico", t:"Creative Services Consultant", loc:"Philippines"},
-        {n:"Idda Baello", t:"Graphic Designer", loc:"Philippines"},
-        {n:"Jeffrey Bayonito", t:"Senior Graphic Designer", loc:"Philippines"},
-        {n:"Miel K. Mabutas", t:"Creative Services Manager", loc:"Philippines"},
-        {n:"Rachelle Recomono", t:"Senior Graphic Web Designer", loc:"Philippines"},
-        {n:"Terra Gullet Brown", t:"Global Art Director, Internal Communications and Talent Acquisition", loc:"United States"}
+        {n:"Terra Gullet Brown", t:"Global Art Director, Internal Communications and Talent Acquisition", loc:"United States", tl:true, sub:{label:"", members:[
+          {n:"Chester Blanco", t:"Senior Graphic Designer", loc:"Philippines"},
+          {n:"Constantine Gulmatico", t:"Creative Services Consultant", loc:"Philippines"},
+          {n:"Idda Baello", t:"Graphic Designer", loc:"Philippines"},
+          {n:"Jeffrey Bayonito", t:"Senior Graphic Designer", loc:"Philippines"},
+          {n:"Miel K. Mabutas", t:"Creative Services Manager", loc:"Philippines"},
+          {n:"Rachelle Recomono", t:"Senior Graphic Web Designer", loc:"Philippines"}
+        ]}}
       ]}
   ]},
   {name:"Jeff Goeke", role:"Executive Projects", location:"United States", members:[]},
@@ -806,10 +817,10 @@ const RAW_DEPARTMENTS = [
       {subteam:true, label:"QA and CMS", members:[
         {n:"Donn Santiago", t:"Lead Specialist", loc:"Philippines"}
       ]},
-      {n:"Mark Musante", t:"Senior Consultant, Multimedia", loc:"United States", sub:{label:"Web Dev & CMS", members:[
+      {n:"Mark Musante", t:"Senior Consultant, Multimedia", loc:"United States", tl:true, sub:{label:"Web Dev & CMS", members:[
         {n:"Sunandha Kanala", t:"Specialist, Multimedia", loc:"India"}
       ]}},
-      {n:"Angelica Bazurto", t:"Marketing Operations and Digital Experience Senior Manager", loc:"Colombia", sub:{label:"Channel Marketing & Metrics", members:[
+      {n:"Angelica Bazurto", t:"Marketing Operations and Digital Experience Senior Manager", loc:"Colombia", tl:true, sub:{label:"Channel Marketing & Metrics", members:[
         {subteam:true, label:"Email Marketing", members:[
           {n:"Andres Romero", t:"Marketing Automation Pardot Specialist", loc:"Colombia"},
           {n:"Radwa Khalifa", t:"Lead Marketing Operations Specialist", loc:"Egypt", shared:"Paid Media"}
@@ -853,6 +864,11 @@ const tbhItem = document.createElement('div');
 tbhItem.className = 'item';
 tbhItem.innerHTML = `${TBH_ICON}To be hired`;
 legend.appendChild(tbhItem);
+
+const tlItem = document.createElement('div');
+tlItem.className = 'item';
+tlItem.innerHTML = `<span class="ov-tl-badge" style="margin-left:0">TL</span>Team Leader`;
+legend.appendChild(tlItem);
 
 // Render overview on load
 renderOverview();
@@ -903,7 +919,8 @@ function buildOvCol(dept){
       row.className = 'ov-person' + (m.tbh ? ' tbh' : '');
       row.dataset.name = norm(m.n);
       row.dataset.title = norm(m.t || '');
-      row.innerHTML = `<span class="p-flag">${pFlag}</span><div class="ov-p-info"><div class="ov-p-name">${m.n}</div><div class="ov-p-title">${m.t}</div></div>`;
+      const tlBadge = m.tl ? '<span class="ov-tl-badge">TL</span>' : '';
+      row.innerHTML = `<span class="p-flag">${pFlag}</span><div class="ov-p-info"><div class="ov-p-name">${m.n}${tlBadge}</div><div class="ov-p-title">${m.t}</div></div>`;
       body.appendChild(row);
     });
     col.appendChild(body);

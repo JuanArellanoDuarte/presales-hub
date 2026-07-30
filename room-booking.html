@@ -137,13 +137,12 @@
   }
   .book-this-room:hover{color:var(--blue);}
   .room-name-row{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+  .room-thumb-wrap{position:relative; flex-shrink:0;}
   .room-thumb{
-    position:relative;
     width:44px;
     height:44px;
     border-radius:9px;
     overflow:hidden;
-    flex-shrink:0;
     background:var(--surface-sunken);
     border:1px solid var(--border);
   }
@@ -167,7 +166,7 @@
     z-index:30;
   }
   .room-thumb-preview img{width:100%; height:100%; object-fit:cover; display:block;}
-  .room-thumb:hover .room-thumb-preview{display:block;}
+  .room-thumb-wrap:hover .room-thumb-preview{display:block;}
   @media(hover:none){
     .room-thumb-preview{display:none !important;}
   }
@@ -578,8 +577,10 @@ function renderRoomCards(){
     const slug = room.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
     return `<div class="room-card">
       <div class="room-name-row">
-        <div class="room-thumb">
-          <img src="images/${slug}.jpg" alt="${escapeHtml(room.name)}" onerror="this.remove()">
+        <div class="room-thumb-wrap">
+          <div class="room-thumb">
+            <img src="images/${slug}.jpg" alt="${escapeHtml(room.name)}" onerror="this.remove()">
+          </div>
           <div class="room-thumb-preview">
             <img src="images/${slug}.jpg" alt="${escapeHtml(room.name)}" onerror="this.parentElement.remove()">
           </div>

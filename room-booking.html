@@ -104,13 +104,28 @@
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:var(--r-card);
-    padding:18px 18px 16px;
+    padding:0 18px 16px;
     position:relative;
+    overflow:hidden;
     border-top:3px solid var(--ink2);
     box-shadow:var(--shadow);
     transition:box-shadow .12s, transform .12s;
   }
   .room-card:hover{box-shadow:0 4px 10px rgba(0,37,81,.10), 0 10px 22px rgba(0,37,81,.10); transform:translateY(-1px);}
+  .room-photo{
+    width:calc(100% + 36px);
+    margin:0 -18px 14px;
+    aspect-ratio:1/1;
+    background:var(--surface-sunken);
+    overflow:hidden;
+  }
+  .room-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .room-body{padding-top:18px;}
   .room-capacity{
     font-size:13px;
     font-weight:700;
@@ -137,40 +152,6 @@
   }
   .book-this-room:hover{color:var(--blue);}
   .room-name-row{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
-  .room-thumb-wrap{position:relative; flex-shrink:0;}
-  .room-thumb{
-    width:44px;
-    height:44px;
-    border-radius:9px;
-    overflow:hidden;
-    background:var(--surface-sunken);
-    border:1px solid var(--border);
-  }
-  .room-thumb img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
-  .room-thumb-preview{
-    display:none;
-    position:absolute;
-    bottom:52px;
-    left:50%;
-    transform:translateX(-50%);
-    width:180px;
-    height:180px;
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 10px 28px rgba(0,37,81,.28);
-    border:2px solid var(--surface);
-    z-index:30;
-  }
-  .room-thumb-preview img{width:100%; height:100%; object-fit:cover; display:block;}
-  .room-thumb-wrap:hover .room-thumb-preview{display:block;}
-  @media(hover:none){
-    .room-thumb-preview{display:none !important;}
-  }
   .room-name{
     font-family:'Inter',sans-serif;
     font-weight:700;
@@ -577,26 +558,23 @@ function renderRoomCards(){
     const free = !busy;
     const slug = room.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
     return `<div class="room-card">
-      <div class="room-name-row">
-        <div class="room-thumb-wrap">
-          <div class="room-thumb">
-            <img src="images/${slug}.jpg" alt="${escapeHtml(room.name)}" onerror="this.remove()">
-          </div>
-          <div class="room-thumb-preview">
-            <img src="images/${slug}.jpg" alt="${escapeHtml(room.name)}" onerror="this.parentElement.remove()">
-          </div>
-        </div>
-        <span class="room-name">${escapeHtml(room.name)}</span>
+      <div class="room-photo">
+        <img src="images/${slug}.jpg" alt="${escapeHtml(room.name)}" onerror="this.parentElement.style.display='none'">
       </div>
-      <div class="room-capacity">👥 Capacity: ${room.capacity != null ? room.capacity : '—'} people</div>
-      <span class="status-pill ${free?'free':'busy'}">
-        <span class="status-dot"></span>${free?'Free now':'Occupied'}
-      </span>
-      ${busy ? `<div class="room-detail">With <b>${escapeHtml(busy.name)}</b> until <b>${busy.end}</b></div>` : ''}
-      ${!busy && next && next.date===todayStr() ? `<div class="room-next">Next booking today: ${next.start} — ${escapeHtml(next.name)}</div>` : ''}
-      ${!busy && next && next.date!==todayStr() ? `<div class="room-next">Next booking: ${fmtDateLabel(next.date)}, ${next.start}</div>` : ''}
-      ${!busy && !next ? `<div class="room-next">No upcoming bookings</div>` : ''}
-      <button class="book-this-room" data-room="${room.id}">Book this room →</button>
+      <div class="room-body">
+        <div class="room-name-row">
+          <span class="room-name">${escapeHtml(room.name)}</span>
+        </div>
+        <div class="room-capacity">👥 Capacity: ${room.capacity != null ? room.capacity : '—'} people</div>
+        <span class="status-pill ${free?'free':'busy'}">
+          <span class="status-dot"></span>${free?'Free now':'Occupied'}
+        </span>
+        ${busy ? `<div class="room-detail">With <b>${escapeHtml(busy.name)}</b> until <b>${busy.end}</b></div>` : ''}
+        ${!busy && next && next.date===todayStr() ? `<div class="room-next">Next booking today: ${next.start} — ${escapeHtml(next.name)}</div>` : ''}
+        ${!busy && next && next.date!==todayStr() ? `<div class="room-next">Next booking: ${fmtDateLabel(next.date)}, ${next.start}</div>` : ''}
+        ${!busy && !next ? `<div class="room-next">No upcoming bookings</div>` : ''}
+        <button class="book-this-room" data-room="${room.id}">Book this room →</button>
+      </div>
     </div>`;
   }).join('');
 

@@ -286,6 +286,98 @@
 
   /* bookings list */
   .filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+
+  /* week view */
+  .week-nav{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:16px;
+  }
+  .week-nav-btn{
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:700;
+    color:var(--ink2);
+    background:var(--surface-sunken);
+    border:1px solid var(--border);
+    border-radius:8px;
+    width:32px;
+    height:32px;
+    cursor:pointer;
+  }
+  .week-nav-btn:hover{background:#E9EDF1;}
+  .week-label{font-size:14px;font-weight:700;color:var(--ink);}
+  .week-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+  .week-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);}
+  .week-legend-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+  .week-grid-wrap{
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow-x:auto;
+    box-shadow:var(--shadow);
+  }
+  .week-grid{
+    display:grid;
+    grid-template-columns:52px repeat(5,1fr);
+    min-width:640px;
+  }
+  .wg-daylabel{
+    text-align:center;
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    padding:10px 4px;
+    border-bottom:1px solid var(--border);
+    border-left:1px solid var(--line);
+  }
+  .wg-corner{border-bottom:1px solid var(--border);}
+  .wg-hour{
+    font-size:10.5px;
+    color:var(--faint);
+    text-align:right;
+    padding:0 8px 0 0;
+    border-top:1px solid var(--line);
+    position:relative;
+    top:-6px;
+  }
+  .wg-daycol{
+    position:relative;
+    border-left:1px solid var(--line);
+    background-image:repeating-linear-gradient(to bottom, var(--line) 0, var(--line) 1px, transparent 1px, transparent 44px);
+  }
+  .wg-block{
+    position:absolute;
+    border-radius:6px;
+    border-left:3px solid;
+    padding:3px 6px;
+    overflow:hidden;
+    box-sizing:border-box;
+  }
+  .wg-block .wg-room{
+    font-size:10.5px;
+    font-weight:800;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .wg-block .wg-person{
+    font-size:10px;
+    font-weight:500;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    opacity:.85;
+  }
+  .wg-empty{
+    grid-column:1 / -1;
+    text-align:center;
+    color:var(--faint);
+    font-size:13px;
+    padding:32px 0;
+  }
   .chip{
     font-size:12px;
     font-weight:500;
@@ -412,6 +504,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="book">Book</button>
       <button class="tab-btn" data-tab="view">View Bookings</button>
+      <button class="tab-btn" data-tab="week">Week View</button>
     </div>
 
     <section class="panel active" id="panel-book">
@@ -462,6 +555,18 @@
       <div class="filter-row" id="filterRow"></div>
       <div id="bookingsList"><p class="loading">Loading bookings...</p></div>
       <button class="cancel-btn" id="exportBtn" style="margin-top:12px;">⭳ Download Excel</button>
+    </section>
+
+    <section class="panel" id="panel-week">
+      <div class="week-nav">
+        <button class="week-nav-btn" id="weekPrev">←</button>
+        <span class="week-label" id="weekLabel"></span>
+        <button class="week-nav-btn" id="weekNext">→</button>
+      </div>
+      <div class="week-legend" id="weekLegend"></div>
+      <div class="week-grid-wrap">
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
     </section>
   </section>
 
@@ -516,6 +621,85 @@ function fmtDateLabel(dateStr){
   if(dateStr===today) return 'Today · '+months[m-1]+' '+d;
   return days[dt.getDay()]+' · '+months[m-1]+' '+d;
 }
+
+let weekOffset = 0;
+const WG_START_HOUR = 7;
+const WG_END_HOUR = 19;
+const WG_HOUR_PX = 44;
+
+function mondayOfWeek(offsetWeeks){
+  const now = new Date();
+  const day = now.getDay();
+  const diffToMonday = (day===0) ? -6 : (1-day);
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate()+diffToMonday+offsetWeeks*7);
+}
+function isoFromDate(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function shortLabel(d){
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[d.getMonth()]+' '+d.getDate();
+}
+
+function renderWeekView(){
+  const monday = mondayOfWeek(weekOffset);
+  const weekDays = Array.from({length:5}, (_,i)=> new Date(monday.getFullYear(), monday.getMonth(), monday.getDate()+i));
+  const friday = weekDays[4];
+  document.getElementById('weekLabel').textContent = `${shortLabel(monday)} – ${shortLabel(friday)}, ${friday.getFullYear()}`;
+
+  document.getElementById('weekLegend').innerHTML = rooms.map(r=>{
+    const tag = TAG_COLORS[r.color] || TAG_COLORS.blue;
+    return `<span class="week-legend-item"><span class="week-legend-dot" style="background:${tag.fg}"></span>${escapeHtml(r.name)}</span>`;
+  }).join('');
+
+  const totalHours = WG_END_HOUR - WG_START_HOUR;
+  const dayHeight = totalHours * WG_HOUR_PX;
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  let html = `<div class="wg-corner"></div>`;
+  weekDays.forEach(d=>{ html += `<div class="wg-daylabel">${dayNames[d.getDay()]} ${d.getDate()}</div>`; });
+
+  html += `<div style="grid-column:1; display:flex; flex-direction:column;">`;
+  for(let h=WG_START_HOUR; h<WG_END_HOUR; h++){
+    html += `<div class="wg-hour" style="height:${WG_HOUR_PX}px;">${h}:00</div>`;
+  }
+  html += `</div>`;
+
+  weekDays.forEach(d=>{
+    const dateStr = isoFromDate(d);
+    const dayBookings = bookings.filter(b=>b.date===dateStr).sort((a,b)=>toMinutes(a.start)-toMinutes(b.start));
+
+    const colEnds = [];
+    const placed = dayBookings.map(b=>{
+      const s = toMinutes(b.start), e = toMinutes(b.end);
+      let colIndex = colEnds.findIndex(endMin => endMin <= s);
+      if(colIndex === -1){ colIndex = colEnds.length; colEnds.push(e); }
+      else { colEnds[colIndex] = e; }
+      return {...b, colIndex};
+    });
+    const totalCols = Math.max(1, colEnds.length);
+
+    let dayHtml = `<div class="wg-daycol" style="height:${dayHeight}px;">`;
+    placed.forEach(b=>{
+      const room = rooms.find(r=>r.id===b.roomId);
+      const tag = room ? (TAG_COLORS[room.color] || TAG_COLORS.blue) : TAG_COLORS.blue;
+      const s = toMinutes(b.start), e = toMinutes(b.end);
+      const top = ((s - WG_START_HOUR*60) / (totalHours*60)) * dayHeight;
+      const blockHeight = Math.max(18, ((e-s)/(totalHours*60)) * dayHeight - 2);
+      const widthPct = 100/totalCols;
+      const leftPct = b.colIndex*widthPct;
+      dayHtml += `<div class="wg-block" style="top:${top}px; height:${blockHeight}px; left:calc(${leftPct}% + 2px); width:calc(${widthPct}% - 4px); background:${tag.bg}; border-left-color:${tag.fg};">
+        <div class="wg-room" style="color:${tag.fg}">${room ? escapeHtml(room.name) : 'Room'}</div>
+        <div class="wg-person" style="color:${tag.fg}">${escapeHtml(b.name)}</div>
+      </div>`;
+    });
+    dayHtml += `</div>`;
+    html += dayHtml;
+  });
+
+  document.getElementById('weekGrid').innerHTML = html;
+}
+
+document.getElementById('weekPrev').addEventListener('click', ()=>{ weekOffset--; renderWeekView(); });
+document.getElementById('weekNext').addEventListener('click', ()=>{ weekOffset++; renderWeekView(); });
 
 async function loadData(){
   const roomsSnap = await getDocs(collection(db,'rooms'));
@@ -708,6 +892,7 @@ function renderAll(){
   renderRoomPicker();
   renderFilters();
   renderBookingsList();
+  renderWeekView();
 }
 
 function escapeHtml(s){
@@ -775,6 +960,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='week') renderWeekView();
   });
 });
 

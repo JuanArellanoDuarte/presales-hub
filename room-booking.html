@@ -106,15 +106,15 @@
     border-radius:var(--r-card);
     padding:18px 18px 16px;
     position:relative;
-    overflow:hidden;
     border-top:3px solid var(--ink2);
     box-shadow:var(--shadow);
     transition:box-shadow .12s, transform .12s;
   }
   .room-card:hover{box-shadow:0 4px 10px rgba(0,37,81,.10), 0 10px 22px rgba(0,37,81,.10); transform:translateY(-1px);}
   .room-capacity{
-    font-size:11.5px;
-    color:var(--faint);
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink2);
     margin:2px 0 0;
     display:flex;
     align-items:center;
@@ -136,14 +136,41 @@
     cursor:pointer;
   }
   .book-this-room:hover{color:var(--blue);}
-  .room-card .door{
-    position:absolute;
-    top:16px;
-    right:16px;
-    width:26px;
-    height:26px;
-  }
   .room-name-row{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+  .room-thumb{
+    position:relative;
+    width:44px;
+    height:44px;
+    border-radius:9px;
+    overflow:hidden;
+    flex-shrink:0;
+    background:var(--surface-sunken);
+    border:1px solid var(--border);
+  }
+  .room-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .room-thumb-preview{
+    display:none;
+    position:absolute;
+    top:-8px;
+    left:52px;
+    width:180px;
+    height:180px;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 28px rgba(0,37,81,.28);
+    border:2px solid var(--surface);
+    z-index:30;
+  }
+  .room-thumb-preview img{width:100%; height:100%; object-fit:cover; display:block;}
+  .room-thumb:hover .room-thumb-preview{display:block;}
+  @media(hover:none){
+    .room-thumb-preview{display:none !important;}
+  }
   .room-name{
     font-family:'Inter',sans-serif;
     font-weight:700;
@@ -542,26 +569,21 @@ function nextBookingFor(roomId){
   return upcoming[0];
 }
 
-function doorSVG(free){
-  const stroke = free ? '#004D3D' : '#D94806';
-  return `<svg class="door" viewBox="0 0 26 26" fill="none">
-    <rect x="6" y="3" width="14" height="20" rx="1.5" stroke="${stroke}" stroke-width="1.6"/>
-    ${free
-      ? `<path d="M6 3 L20 6 L20 20 L6 23" stroke="${stroke}" stroke-width="1.6" fill="none" opacity="0.55"/>`
-      : ``}
-    <circle cx="16" cy="13" r="1.1" fill="${stroke}"/>
-  </svg>`;
-}
-
 function renderRoomCards(){
   const grid = document.getElementById('roomsGrid');
   grid.innerHTML = rooms.map(room=>{
     const busy = currentBookingFor(room.id);
     const next = nextBookingFor(room.id);
     const free = !busy;
+    const slug = room.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
     return `<div class="room-card">
-      ${doorSVG(free)}
       <div class="room-name-row">
+        <div class="room-thumb">
+          <img src="images/${slug}.jpg" alt="${escapeHtml(room.name)}" onerror="this.remove()">
+          <div class="room-thumb-preview">
+            <img src="images/${slug}.jpg" alt="${escapeHtml(room.name)}" onerror="this.parentElement.remove()">
+          </div>
+        </div>
         <span class="room-name">${escapeHtml(room.name)}</span>
       </div>
       <div class="room-capacity">👥 Capacity: ${room.capacity != null ? room.capacity : '—'} people</div>

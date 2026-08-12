@@ -449,6 +449,7 @@
   .booking-person{font-size:13.5px;color:var(--muted);margin:0;}
   .booking-person b{color:var(--ink2);font-weight:600;}
   .booking-purpose{font-size:13px;color:var(--faint);margin:2px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .booking-actions{display:flex; gap:6px; flex-shrink:0;}
   .cancel-btn{
     background:none;
     border:1px solid var(--border);
@@ -460,6 +461,32 @@
     white-space:nowrap;
   }
   .cancel-btn:hover{border-color:var(--danger);color:var(--danger);}
+  .edit-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .edit-btn:hover{border-color:var(--blue);color:var(--accent-strong);}
+  .edit-banner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#D6EEFF;
+    border:1px solid var(--blue);
+    color:var(--accent-strong);
+    font-size:12.5px;
+    font-weight:600;
+    padding:9px 14px;
+    border-radius:10px;
+    margin-bottom:16px;
+  }
+  .edit-banner a{color:var(--accent-strong); font-weight:700; text-decoration:underline; cursor:pointer;}
   .empty{
     text-align:center;
     color:var(--faint);
@@ -509,6 +536,10 @@
 
     <section class="panel active" id="panel-book">
       <div class="card">
+        <div class="edit-banner" id="editBanner" style="display:none;">
+          <span id="editBannerText"></span>
+          <a id="cancelEditLink">Cancel edit</a>
+        </div>
         <div class="form-grid">
           <div class="field full">
             <label>Room</label>
@@ -836,7 +867,10 @@ function renderBookingsList(){
             <p class="booking-person">Booked by <b>${escapeHtml(b.name)}</b></p>
             ${b.purpose ? `<p class="booking-purpose">${escapeHtml(b.purpose)}</p>` : ''}
           </div>
-          <button class="cancel-btn" data-id="${b.id}">Cancel</button>
+          <div class="booking-actions">
+            <button class="edit-btn" data-id="${b.id}">Edit</button>
+            <button class="cancel-btn" data-id="${b.id}">Cancel</button>
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -845,6 +879,15 @@ function renderBookingsList(){
       ${rowsHtml}
     </div>`;
   }).join('');
+
+  container.querySelectorAll('.edit-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.id;
+      const b = bookings.find(x=>x.id===id);
+      if(!b) return;
+      enterEditMode(b);
+    });
+  });
 
   container.querySelectorAll('.cancel-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
@@ -900,6 +943,48 @@ function escapeHtml(s){
 }
 
 // form submit
+let editingId = null;
+let editingCreatedAt = null;
+
+function enterEditMode(b){
+  editingId = b.id;
+  editingCreatedAt = b.createdAt || new Date().toISOString();
+
+  selectedRoomId = b.roomId;
+  renderRoomPicker();
+  document.getElementById('fName').value = b.name;
+  document.getElementById('fDate').value = b.date;
+  const [sh, sm] = b.start.split(':');
+  const [eh, em] = b.end.split(':');
+  document.getElementById('fStartH').value = sh;
+  document.getElementById('fStartM').value = sm;
+  document.getElementById('fEndH').value = eh;
+  document.getElementById('fEndM').value = em;
+  document.getElementById('fPurpose').value = b.purpose || '';
+
+  document.getElementById('editBanner').style.display = 'flex';
+  document.getElementById('editBannerText').textContent = `Editing booking for ${b.name}`;
+  document.getElementById('submitBtn').textContent = 'Save Changes';
+
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector('.tab-btn[data-tab="book"]').classList.add('active');
+  document.getElementById('panel-book').classList.add('active');
+  document.querySelector('.block-book').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function exitEditMode(){
+  editingId = null;
+  editingCreatedAt = null;
+  document.getElementById('editBanner').style.display = 'none';
+  document.getElementById('submitBtn').textContent = 'Book Room';
+  document.getElementById('fName').value = '';
+  document.getElementById('fPurpose').value = '';
+  document.getElementById('fDate').value = todayStr();
+}
+
+document.getElementById('cancelEditLink').addEventListener('click', exitEditMode);
+
 document.getElementById('submitBtn').addEventListener('click', async ()=>{
   const name = document.getElementById('fName').value.trim();
   const date = document.getElementById('fDate').value;
@@ -920,6 +1005,7 @@ document.getElementById('submitBtn').addEventListener('click', async ()=>{
     return;
   }
   const conflict = bookings.find(b=>
+    b.id !== editingId &&
     b.roomId===selectedRoomId && b.date===date &&
     toMinutes(start) < toMinutes(b.end) && toMinutes(end) > toMinutes(b.start)
   );
@@ -929,15 +1015,13 @@ document.getElementById('submitBtn').addEventListener('click', async ()=>{
     return;
   }
 
-  const newBooking = {
-    id: 'b_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-    roomId: selectedRoomId,
-    name, date, start, end, purpose,
-    createdAt: new Date().toISOString()
-  };
+  const isEditing = !!editingId;
+  const bookingId = isEditing ? editingId : ('b_' + Date.now() + '_' + Math.random().toString(36).slice(2,7));
+  const createdAt = isEditing ? editingCreatedAt : new Date().toISOString();
+
   try{
-    await setDoc(doc(db,'bookings', newBooking.id), {
-      roomId: newBooking.roomId, name, date, start, end, purpose, createdAt: newBooking.createdAt
+    await setDoc(doc(db,'bookings', bookingId), {
+      roomId: selectedRoomId, name, date, start, end, purpose, createdAt
     });
   }catch(e){
     console.error('Could not save booking', e);
@@ -946,9 +1030,10 @@ document.getElementById('submitBtn').addEventListener('click', async ()=>{
     return;
   }
 
-  msg.innerHTML = '✓ Booking confirmed.';
+  msg.innerHTML = isEditing ? '✓ Booking updated.' : '✓ Booking confirmed.';
   msg.classList.add('ok');
-  document.getElementById('fPurpose').value = '';
+  if(isEditing) exitEditMode();
+  else document.getElementById('fPurpose').value = '';
   renderAll();
   setTimeout(()=>{ msg.innerHTML=''; msg.className='form-msg'; }, 4000);
 });
